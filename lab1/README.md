@@ -3,10 +3,15 @@
 ## Running
 
 ```bash
-make       # compile all parts
-./part1.o  # run the programs separately
+# compile all parts
+make
+
+# run the programs separately
+./part1.o
 ./part2.o
 ./part3.o
 ./part4.o
-make clean # remove binaries
+
+# remove binaries
+make clean
 ```
