@@ -13,9 +13,9 @@ int main() {
    * another level.
    * 
    * 
-   *             x              main process
+   *             x              main process - 3 children
    *      x      x       x      level 1 - 3 children each
-   *     xxx    xxx     xxx     level 2 - 3 children each
+   *     xxx    xxx     xxx     level 2 - no children
    */
   for (int i = 0; i < 3; i++) {
     int pid = fork();
