@@ -16,7 +16,7 @@ You are to write a very simple shell program, similar to the example covered in 
 
 ## The Second Programming Task (up to 10 additional points)
 
-You are to write a program that will create exactly **eight** child processes (not including the initial program itself). You are **not **to allow any single process to create more than two child processes.
+You are to write a program that will create exactly **eight** child processes (not including the initial program itself). You are **not** to allow any single process to create more than two child processes.
 
 ## The Third Programming Task (up to an additional 20 points)
 
