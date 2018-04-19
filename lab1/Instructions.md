@@ -4,9 +4,7 @@
 
 ## Programming Assignment #1: Creating Processes
 
-**Due Date:** Demo **Schedule a time with your TA before your next lab (April 19th and 20th)**,
-
-submit code and documentation **before the end of that day**
+**Due Date:** Demo **Schedule a time with your TA before your next lab (April 19th and 20th)**, submit code and documentation **before the end of that day**
 
 ## The Basic Programming Task (up to 20 points)
 
