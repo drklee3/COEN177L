@@ -20,10 +20,12 @@ int main() {
    */
   for (int i = 0; i < 3; i++) {
     // add a flag for the z child
-    if (current_level == 0 && i == 0) {
-      z = 1;
-    } else if (current_level == 0 && i) {
-      z = 0;
+    if (current_level == 0) {
+      if (i == 0) {
+        z = 1;
+      } else {
+        z = 0;
+      }
     }
 
     int pid = fork();
@@ -33,24 +35,21 @@ int main() {
       current_level += 1;
       printf("i = %d, level = %d, parentId = %d, myId = %d\n", i, current_level, getppid(), getpid());
 
-      // only for children of node z
       if (z && current_level == 2) {
+        // only for children of node z
         if (i == 0) {
           i = -1; // node a - 3 children
         } else if (i == 1) {
-          i = 0; // node b - 2 children
+          i = 0;  // node b - 2 children
         } else {
-          break; // node c - no children
+          break;  // node c - no children
         }
+
+      } else if (current_level < 2) {
+        i = -1;   // 3 child nodes for all previous levels
+        
       } else {
-        // other children
-        if (current_level < 2) {
-          // 3 child nodes for all previous levels
-          i = -1;
-        } else {
-          // all other nodes on level 2
-          break;
-        }
+        break;    // all other nodes on level 2 - no children
       }
       
     } else {
