@@ -47,13 +47,13 @@ All child nodes would create 3 nodes except for the nodes on level 2.  Because a
 Creating 17 total children with 2-3 child processes each is similar to part 3 with the following structure:
 
 ```
-             x           level 0 - 3 children (main process)
-     ┌───────┼────┐
-     z       x    x      level 1 - 3 children each
- ┌───┼───┐  ┌┼┐  ┌┼┐
- a   b   x  xxx  xxx     level 2 - no children
-┌┼┐ ┌┤
-xxx xx 
+               x           level 0 - 3 children (main process)
+      ┌────────┼────┐
+      z        x    x      level 1 - 3 children each
+ ┌────┼────┐  ┌┼┐  ┌┼┐
+ a    b    x  xxx  xxx     level 2 - no children
+┌┼┐  ┌┤
+xxx  xx
 ```
 
 Most of the child processes create 3 further children similar to before, but the processes labeled `a` and `b` create 3 and 2 additional children respectively. Because the process "tree" is now unbalanced, we need to keep track of the process `z` which is `level == 1 && i == 0` which can be assigned to a `z` flag. This is used in level 2 to determine which child process we are currently on, along with the loop value `i`.  Process `a` would be `z && level == 2 && i == 0`, while process `b` would be the same except with `i == 1`. 
