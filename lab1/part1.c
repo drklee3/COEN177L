@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
     if (fork() == 0) {
       // child code
       execve(input, argv, 0);
+      printf("Invalid command.\n"); // if execve failed, print err message
       break; // exits invalid program
     } else {
       // parent
