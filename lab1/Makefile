@@ -3,7 +3,7 @@ CFLAGS = -std=c99
 SRCS = $(wildcard *.c)
 PROGS = $(patsubst %.c,%,$(SRCS))
 
-.PHONY: default clean
+.PHONY: default clean submit
 default: all
 all: $(PROGS)
 
@@ -12,3 +12,7 @@ all: $(PROGS)
 
 clean:
 	-rm -f *.o
+	-rm -f *.tar
+
+submit:
+	-tar -cvf lab.tar *.c Makefile README.md
