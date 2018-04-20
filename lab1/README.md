@@ -27,6 +27,26 @@ This simple shell creates an infinite loop which accepts user input from `stdin`
 
 This program creates 8 child processes with 1 child process each. Each process calls `fork` which creates a child process, waits until the child process exits, then exits with a `break` to exit the loop. This creates a chain of processes until it reaches a length of 8.
 
+```
+ x  Main process
+ │
+ x  Children
+ │
+ x
+ │
+ x
+ │
+ x
+ │
+ x
+ │
+ x
+ │
+ x
+ │
+ x
+```
+
 ### Part 3
 
 To create 12 total children with 2-3 child processes each, the following structure is made:
