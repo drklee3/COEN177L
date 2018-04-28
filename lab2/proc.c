@@ -1311,7 +1311,7 @@ PRIVATE struct proc * pick_proc(void)
    * The lowest queue contains IDLE, which is always ready.
    */
   for (q=0; q < NR_SCHED_QUEUES; q++) {
-		q = rand() % 100 > 90 && q > 3 ? q + (rand() % (NR_SCHED_QUEUES - q)) : q;
+		q = rand() % 10 == 0 && q > 3 ? q + (rand() % (NR_SCHED_QUEUES - q)) : q;
 		if (!(rp = rdy_head[q]))
 		{
 			TRACE(VF_PICKPROC, printf("queue %d empty\n", q););
