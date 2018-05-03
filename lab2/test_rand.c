@@ -16,13 +16,14 @@ int modify(int q) {
   // make sure q doesn't go over NR_SCHED_QUEUES
   assert(q < NR_SCHED_QUEUES);
 
-  // print out only modified priorities
-  if (before != q) {
-    printf("%2d => %2d\n", before, q);
-    return 1;
+  // return 0 if not modified
+  if (before == q) {
+    return 0;
   }
 
-  return 0;
+  // print out only modified priorities
+  printf("%2d => %2d\n", before, q);
+  return 1;
 }
 
 int main() {
@@ -34,8 +35,8 @@ int main() {
 
   printf("Modified priorities:\n");
   for (int i = 0; i < TRIALS; i++) {
-    for (int i = 0; i < NR_SCHED_QUEUES; i++) {
-      if (modify(i)) {
+    for (int j = 0; j < NR_SCHED_QUEUES; j++) {
+      if (modify(j)) {
         modified++;
       }
     }
