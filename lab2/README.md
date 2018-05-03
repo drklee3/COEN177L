@@ -4,7 +4,7 @@
 
 ```bash
 # copy modified files to minux dir
-cp *.c /usr/src/kernel/
+cp -t /usr/src/kernel/ main.c proc.c
 cd /usr/src/
 # compile and reboot
 make world
