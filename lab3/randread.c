@@ -42,19 +42,20 @@ int main(int argc, char *argv[]) {
   int res;
   long rand_num;
   double perc;
-  
+
   while(count < fileSize) {
     do {
+      // generate random u64 number
       rand_num = rand();
       rand_num = (rand_num << 32) | rand();
       // seek to random position
       res = fseek(file, rand_num % fileSize, SEEK_SET);
-      // printf("rand: %d, res: %d\n", rand_num, res);
+      // retry if fseek failed
     } while(res);
     _ = fgetc(file); // returns something but dont care
     ++count;
 
-    // print status
+    // print percent status
     perc = (count * 1.0 / fileSize * 1.0) * 100.0;
     if (count % 1000 == 0) {
       printf("\x1B[33m Percent complete: %.*f%%\r", 2, perc);
