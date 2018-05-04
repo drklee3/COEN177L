@@ -1,7 +1,4 @@
-#include <unistd.h>
-#include <sys/wait.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
@@ -29,10 +26,7 @@ int modify(int q) {
 int main() {
   srand(time(NULL));
 
-  // number of total modification attempts
-  int total = NR_SCHED_QUEUES * TRIALS;
   int modified = 0;
-
   printf("Modified priorities:\n");
   for (int i = 0; i < TRIALS; i++) {
     for (int j = 0; j < NR_SCHED_QUEUES; j++) {
@@ -42,9 +36,10 @@ int main() {
     }
   }
 
-  // percentage modified
-  float percentage = (modified * 1.0 / total * 1.0) * 100;
-  printf("%.*f%% modified / %d total\n", 2, percentage, total);
+  // number of total modification attempts
+  int total = TRIALS * NR_SCHED_QUEUES;
+  float percentage_modified = (modified * 1.0 / total * 1.0) * 100;
+  printf("%.*f%% modified / %d total\n", 2, percentage_modified, total);
 
   // only those q <= 3
   int over_three = TRIALS * (NR_SCHED_QUEUES - 4);
