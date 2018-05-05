@@ -5,15 +5,17 @@
 You can use the `run.sh` script to generate random files, compile, and run the trials.
 
 ```text
-./run.sh [-rsSh] [-l file] [-t trials] [-p path] [-s suffix]
-  -r          only run random reads (default runs both)
-  -s          only run sequential reads (default runs both)
+./run.sh [-rsSch] [-l file] [-t trials] [-p path] [-s suffix]
+  -r          only run random reads (default: runs both)
+  -s          only run sequential reads (default: runs both)
   -S          skip generation of random files
+  -c          skip check for random files for existance and size
   -h          display help
-  -l file     specify log file for output (default output.log)
-  -t trials   specify number of trials to run each (default 3)
-  -p path     specify path for random data files (default /local/weka/)
-  -o suffix    specify random data file suffix (default .bin)
+  -l file     specify log file for output (default: output.log)
+  -t trials   specify number of trials to run each (default: 3)
+  -p path     specify path for random data files (default: /local/weka/)
+  -o suffix   specify random data file suffix (default: .bin)
+
 ```
 
 ### Examples
