@@ -32,9 +32,8 @@ int main(int argc, char *argv[]) {
   printf("Attempting to read a %lld byte file sequentially at %s.\n", fileSize, buff_start);
 
   // read file
-  int _;
   int count = 0;
-  while((_ = fgetc(file)) != EOF) {}
+  while(fgetc(file) != EOF) {}
 
   // get time difference
   time_t end = time(0);

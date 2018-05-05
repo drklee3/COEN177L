@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
   // seed rand
   srand(time(NULL));
 
-  int _;
   int count = 0;
   int res;
   long long rand_num;
@@ -51,7 +50,7 @@ int main(int argc, char *argv[]) {
       res = fseek(file, rand_num % fileSize, SEEK_SET);
       // retry if fseek failed
     } while(res);
-    _ = fgetc(file); // returns something but dont care
+    fgetc(file); // returns something but dont care
     ++count;
 
     // print percent status every 1k
