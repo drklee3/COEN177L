@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
   // get file size
   fseek(file, 0L, SEEK_END);
-  long fileSize = ftell(file);
+  long long fileSize = ftell(file);
   fseek(file, 0L, SEEK_SET);
 
   // format start time
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   strftime(buff_start, 100, "%Y-%m-%dT%H:%M:%S", localtime(&start));
 
   // print size / start time
-  printf("Attempting to read a %d byte file sequentially at %s.\n", fileSize, buff_start);
+  printf("Attempting to read a %lld byte file sequentially at %s.\n", fileSize, buff_start);
 
   // read file
   int _;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   // format end time
   char buff_end[100];
   strftime(buff_end, 100, "%Y-%m-%dT%H:%M:%S", localtime(&end));
-  printf("Finished reading file at %s (took %lld seconds)\n", buff_end, diff);
+  printf("Finished reading file at %s (took %ld seconds)\n", buff_end, diff);
 
   return 0;
 }

@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   strftime(buff_start, 100, "%Y-%m-%dT%H:%M:%S", localtime(&start));
 
   // print size / start time
-  printf("Attempting to read a %d byte file randomly at %s.\n", fileSize, buff_start);
+  printf("Attempting to read a %lld byte file randomly at %s.\n", fileSize, buff_start);
 
   // seed rand
   srand(time(NULL));
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   // format end time
   char buff_end[100];
   strftime(buff_end, 100, "%Y-%m-%dT%H:%M:%S", localtime(&end));
-  printf("Finished reading file at %s (took %lld seconds)\n", buff_end, diff);
+  printf("Finished reading file at %s (took %ld seconds)\n", buff_end, diff);
 
   return 0;
 }
