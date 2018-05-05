@@ -4,7 +4,7 @@
 
 You can use the `run.sh` script to generate random files, compile, and run the trials.
 
-```bash
+```text
 Usage: ./run.sh [-rsSh] [-l file] [-t trials] [-p path] [-s suffix]
   -r          only run random reads (default runs both)
   -s          only run sequential reads (default runs both)
