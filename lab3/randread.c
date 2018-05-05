@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <inttypes.h>
 
 int main(int argc, char *argv[]) {
   // check args
@@ -23,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   // get file size
   fseek(file, 0L, SEEK_END);
-  long fileSize = ftell(file);
+  long long fileSize = ftell(file);
   fseek(file, 0L, SEEK_SET);
 
   // format start time
@@ -40,7 +39,7 @@ int main(int argc, char *argv[]) {
   int _;
   int count = 0;
   int res;
-  long rand_num;
+  long long rand_num;
   double perc;
 
   while(count < fileSize) {
