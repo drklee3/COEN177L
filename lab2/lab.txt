@@ -1,0 +1,6 @@
+don't modify scheduler priority less than 3
+
+include
+ - 2 files modified
+ - readme with modifications and where 
+ - how modifications randomly slowed down scheduler

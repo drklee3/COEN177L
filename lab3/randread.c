@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     _ = fgetc(file); // returns something but dont care
     ++count;
 
-    // print percent status
+    // print percent status every 1k
     perc = (count * 1.0 / fileSize * 1.0) * 100.0;
     if (count % 1000 == 0) {
       printf("Percent complete: %.*f%%\r", 2, perc);
