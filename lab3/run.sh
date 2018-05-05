@@ -75,15 +75,15 @@ run_trial() {
 # print usage
 usage() {
   echo "Usage: $0 [-rsSch] [-l file] [-t trials] [-p path] [-s suffix]"
-  echo "  -r          only run random reads (default runs both)"
-  echo "  -s          only run sequential reads (default runs both)"
+  echo "  -r          only run random reads (default: runs both)"
+  echo "  -s          only run sequential reads (default: runs both)"
   echo "  -S          skip generation of random files"
   echo "  -c          skip check for random files for existance and size"
   echo "  -h          display help"
-  echo "  -l file     specify log file for output (default output.log)"
-  echo "  -t trials   specify number of trials to run each (default 3)"
-  echo "  -p path     specify path for random data files (default /local/weka/)"
-  echo "  -o suffix   specify random data file suffix (default .bin)"
+  echo "  -l file     specify log file for output (default: output.log)"
+  echo "  -t trials   specify number of trials to run each (default: 3)"
+  echo "  -p path     specify path for random data files (default: /local/weka/)"
+  echo "  -o suffix   specify random data file suffix (default: .bin)"
   exit 1
 }
 
