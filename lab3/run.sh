@@ -1,6 +1,7 @@
 #!/bin/bash
 run_seq="true"
 run_rand="true"
+should_check_files="true"
 skip_gen="false"
 trials="3"
 log_file="output.log"
@@ -13,6 +14,7 @@ file_sizes_bytes=( 1073000000 2620000000 5368000000 )
 # pretty file sizes
 file_list=( "1G" "2.5G" "5G" )
 
+# generate files
 gen_files() {
   echo "Generating random files in $file_path"
   for index in ${!file_sizes[*]};
@@ -22,6 +24,7 @@ gen_files() {
   done
 }
 
+# check random data files if they're readable and minimum size
 check_files() {
   echo "Checking random files..."
   for index in ${!file_sizes[*]};
@@ -44,7 +47,7 @@ check_files() {
   done
 }
 
-
+# run a test for each of the files
 run_test() {
   for fname in "${file_list[@]}"
   do
@@ -54,6 +57,7 @@ run_test() {
   done
 }
 
+# run a trial, either seq or random
 run_trial() {
   for i in $(seq 1 $trials); do
     if [ "$1" == "seqread" ]; then
@@ -67,20 +71,22 @@ run_trial() {
   done
 }
 
+# print usage
 usage() {
-  echo "Usage: $0 [-rsSh] [-l file] [-t trials] [-p path] [-s suffix]"
+  echo "Usage: $0 [-rsSch] [-l file] [-t trials] [-p path] [-s suffix]"
   echo "  -r          only run random reads (default runs both)"
   echo "  -s          only run sequential reads (default runs both)"
   echo "  -S          skip generation of random files"
+  echo "  -c          skip check for random files for existance and size"
   echo "  -h          display help"
   echo "  -l file     specify log file for output (default output.log)"
   echo "  -t trials   specify number of trials to run each (default 3)"
   echo "  -p path     specify path for random data files (default /local/weka/)"
-  echo "  -o suffx    specify random data file suffix (default .bin)"
+  echo "  -o suffix   specify random data file suffix (default .bin)"
   exit 1
 }
 
-
+# parse input flags
 while getopts "rsSht:p:" flag; do
   case $flag in
     r) run_seq="false" ;;
@@ -102,7 +108,11 @@ else
 fi
 
 # check if files exist and are correct size
-check_files
+if [ $should_check_files == "true" ]; then
+  check_files
+else
+  echo "Skipping random file check."
+fi
 
 # compile files, if that wasn't obvious enough
 echo "Compiling c files"
