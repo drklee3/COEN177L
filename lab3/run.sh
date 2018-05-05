@@ -52,7 +52,8 @@ run_test() {
   for fname in "${file_list[@]}"
   do
     (printf "Reading $fname file\n" |& tee -a $log_file)
-    (time ./$1.o "${file_path}${fname}.${file_suffix}") |& tee -a $log_file
+    # run program, filter out percent complete status
+    (time ./$1.o "${file_path}${fname}.${file_suffix}") |& tee >(grep -v "Percent complete:" >> $log_file)
     (printf "%s\n\n" "-----------------------" |& tee -a $log_file)
   done
 }
@@ -87,11 +88,12 @@ usage() {
 }
 
 # parse input flags
-while getopts "rsSht:p:" flag; do
+while getopts "rsScht:p:" flag; do
   case $flag in
     r) run_seq="false" ;;
     s) run_rand="false" ;;
     S) skip_gen="true" ;;
+    c) should_check_files="false" ;;
     h) usage ;;
     t) trials=${OPTARG} ;;
     p) file_path="${OPTARG}" ;;
