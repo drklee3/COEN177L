@@ -34,14 +34,7 @@ int main(int argc, char *argv[]) {
   // read file
   int _;
   int count = 0;
-  double perc;
-  while((_ = fgetc(file)) != EOF) {
-    // perc = (count * 1.0 / fileSize * 1.0) * 100.0;
-    // if (count % 1000 == 0) {
-    //   printf("Percent complete: %.*f%%\r", 2, perc);
-    // }
-    // ++count;
-  }
+  while((_ = fgetc(file)) != EOF) {}
 
   // get time difference
   time_t end = time(0);
