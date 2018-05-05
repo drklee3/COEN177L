@@ -47,30 +47,53 @@ check_files() {
   done
 }
 
-# run a test for each of the files
+# run a test for n trials
+# $1  seqread or randread executable name
+# $2  filename to read
 run_test() {
+  # delete mtime file in case
+  if [ -e /tmp/mtime.$$ ]; then
+    rm /tmp/mtime.$$
+  fi
+
+  for i in $(seq 1 $trials); do
+    # output read type and trial #
+    if [ "$1" == "seqread" ]; then
+      echo "[trial #$i / $trials] Reading $2 sequentially" |& tee -a $log_file
+    else
+      echo "[trial #$i / $trials] Reading $2 randomly" |& tee -a $log_file
+    fi
+
+    # run program, filter out percent complete status
+    # output time command to /tmp/mtime.$$, not really safe but oh well in this case don't really care
+    /usr/bin/time -f "real %e user %U sys %S" -a -o /tmp/mtime.$$ \
+      ./$1.o "${file_path}${2}.${file_suffix}" |& tee >(grep -v "Percent complete:" >> $log_file)
+    # print time to stdout from time command
+    tail -1 /tmp/mtime.$$
+    printf "%s\n\n" "-----------------------" |& tee -a $log_file
+  done
+  # finished running file n trials
+  echo "=======================" |& tee -a $log_file
+  echo "Finished $1 read for $2 ($trials trials)" |& tee -a $log_file
+  # print out average data and standard deviation for real time
+  awk '{ et += $2; ut += $4; st += $6; count++; sum+=$2; sumsq+=$2*$2 } END \
+    {  printf "\033[1;32mAverage: real %.3f ± %.3f user %.3f sys %.3f\033[0m\n", \
+    et/count, sqrt(sumsq/NR - (sum/NR)**2), ut/count, st/count }' /tmp/mtime.$$ |& tee -a $log_file
+  printf "%s\n\n" "=======================" |& tee -a $log_file
+  # delete mtime file
+  rm /tmp/mtime.$$
+}
+
+# read each file for n trials
+# $1  seqread or randread executable name
+run_trial() {
   for fname in "${file_list[@]}"
   do
-    (printf "Reading $fname file\n" |& tee -a $log_file)
-    # run program, filter out percent complete status
-    (time ./$1.o "${file_path}${fname}.${file_suffix}") |& tee >(grep -v "Percent complete:" >> $log_file)
-    (printf "%s\n\n" "-----------------------" |& tee -a $log_file)
+    echo " > Reading $fname"
+    run_test $1 $fname
   done
 }
 
-# run a trial, either seq or random
-run_trial() {
-  for i in $(seq 1 $trials); do
-    if [ "$1" == "seqread" ]; then
-      echo "Starting Trial $i (sequential)" |& tee -a $log_file
-    else
-      echo "Starting Trial $i (random)" |& tee -a $log_file
-    fi
-    run_test $1
-    echo "Finished Trial $i" |& tee -a $log_file
-    (printf "%s\n\n" "=======================" |& tee -a $log_file)
-  done
-}
 
 # print usage
 usage() {
