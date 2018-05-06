@@ -20,6 +20,9 @@ You can use the `run.sh` script to generate random files, compile, and run the t
 ### Examples
 
 ```bash
+# make run.sh executable
+chmod +x run.sh
+
 # run without generating random data files (assuming they are already made)
 ./run.sh -S
 
@@ -49,27 +52,36 @@ time ./randread.o /local/weka/1G.bin
 
 ## Results
 
-Times in seconds
+Times in seconds, each file run with 3 trials.
 
 ### Sequential
 
 ```text
 1G
- Time:   real (mean ± σ):  7.007 ± 0.054 [user  6.800 sys 0.207]
-Range:       (min … max):  6.95  … 7.08
+ Time:   real (mean ± σ): 6.283 ± 0.047 [user 6.043 sys 0.233]
+Range:       (min … max):  6.25  … 6.35
 
 2.5G
- Time:   real (mean ± σ): 13.197 ± 0.145 [user 12.800 sys 0.387]
-Range:       (min … max): 13.04  … 13.39
+ Time:   real (mean ± σ): 15.170 ± 0.051 [user 14.637 sys 0.527]
+Range:       (min … max): 15.12  … 15.24
 
 5G
- Time:   real (mean ± σ): 35.587 ± 0.512 [user 34.483 sys 1.090]
-Range:       (min … max): 35.21  … 36.31
+ Time:   real (mean ± σ): 30.827 ± 0.161 [user 29.733 sys 1.090]
+Range:       (min … max): 30.60  … 30.96
 ```
 
 ### Random
 
+```text
+1G
 
+
+2.5G
+
+
+5G
+
+```
 
 * use wallclock time
 * run each file 3 times for both rand/seqread
