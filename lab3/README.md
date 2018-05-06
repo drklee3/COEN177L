@@ -5,6 +5,9 @@
 You can use the `run.sh` script to generate random files, compile, and run the trials.
 
 ```text
+# make run.sh executable
+chmod +x run.sh
+
 ./run.sh [-rsSch] [-l file] [-t trials] [-p path] [-s suffix]
   -r          only run random reads (default: runs both)
   -s          only run sequential reads (default: runs both)
@@ -20,8 +23,8 @@ You can use the `run.sh` script to generate random files, compile, and run the t
 ### Examples
 
 ```bash
-# make run.sh executable
-chmod +x run.sh
+# generate random files and run 3 trials for sequential and random reads for the 3 sized files
+./run.sh
 
 # run without generating random data files (assuming they are already made)
 ./run.sh -S
