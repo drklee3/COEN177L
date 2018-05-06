@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
 
   long long count = 0; // has to be u64 or will overflow
   long long rand_num;
-  int res;
-  double perc;
+  int       res;
+  double    perc;
 
   // progress bar stuff
   char s1[] = "##############################";
@@ -44,8 +44,10 @@ int main(int argc, char *argv[]) {
   // time display
   time_t start = time(0);
   time_t now;
-  char buff_eta[100];
-  char buff_elapsed[100];
+  time_t diff;
+  time_t last_diff;
+  char   buff_eta[100];
+  char   buff_elapsed[100];
 
   while(count < fileSize) {
     do {
@@ -58,19 +60,24 @@ int main(int argc, char *argv[]) {
     } while(res);
     fgetc(file); // returns something but dont care
     ++count;
+    
+    // calculate time diff
+    now = time(0);
+    diff = now - start;
+    // only output once per second
+    if (last_diff != diff) {
+      last_diff = diff;
 
-    if (count % 100000 == 0) {
-      // print percent status every 1k
       perc = (count * 1.0 / fileSize * 1.0);
       float perc_100 = perc * 100.0; // percent to display
 
-      now = time(0);
-      time_t diff = now - start;
+      // calculate eta and elapsed time
       float perc_left = 100 - perc_100;
       time_t eta = (diff / perc_100) * perc_left;
       strftime(buff_eta, 100, "%H:%M:%S", gmtime(&eta));
       strftime(buff_elapsed, 100, "%H:%M:%S", gmtime(&diff));
 
+      // output data to stdout
       printf("\rProgress: %6.*f%% [%.*s%.*s] ETA %s (%s elapsed)",
         2, perc_100,
         (int)(LOADING_WIDTH * perc), s1,
