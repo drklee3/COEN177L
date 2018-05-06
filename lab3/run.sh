@@ -76,9 +76,15 @@ run_test() {
   echo "=======================" |& tee -a $log_file
   echo "Finished $1 read for $2 ($trials trials)" |& tee -a $log_file
   # print out average data and standard deviation for real time
-  awk '{ et += $2; ut += $4; st += $6; count++; sum+=$2; sumsq+=$2*$2 } END \
-    {  printf "\033[1;32mAverage: real (mean ± σ): %.3f ± %.3f [user %.3f sys %.3f]\033[0m\n", \
-    et/count, sqrt(sumsq/NR - (sum/NR)**2), ut/count, st/count }' /tmp/mtime.$$ |& tee -a $log_file
+  awk 'BEGIN {min=max=""} \
+    /^real/ { \
+      {et += $2; ut += $4; st += $6; count++; sum+=$2; sumsq+=$2*$2}; \
+      if (min == "" || $2 < min) min = $2; \
+      if (max == "" || $2 > max) max = $2; \
+    } END \
+    {  printf "\033[1;32m Time:   real (mean ± σ):  %.3f ± %.3f [user %.3f sys %.3f] \
+    \nRange:       (min … max):  %.3f … %.3f\033[0m\n", \
+    et/count, sqrt(sumsq/count - (sum/count)**2), ut/count, st/count, min, max }' /tmp/mtime.$$ |& tee -a $log_file
   printf "%s\n\n" "=======================" |& tee -a $log_file
   # delete mtime file
   rm /tmp/mtime.$$
