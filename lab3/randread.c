@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <time.h>
 
+const int LOADING_WIDTH = 30;
+
 int main(int argc, char *argv[]) {
   // check args
   if (argc < 2) {
@@ -25,22 +27,25 @@ int main(int argc, char *argv[]) {
   long long fileSize = ftell(file);
   fseek(file, 0L, SEEK_SET);
 
-  // format start time
-  // time_t start = time(0);
-  // char buff_start[100];
-  // strftime(buff_start, 100, "%Y-%m-%dT%H:%M:%S", localtime(&start));
-
-  // print size / start time
-  // printf("Attempting to read a %lld byte file randomly at %s.\n", fileSize, buff_start);
   printf("Attempting to read a %lld byte file randomly.\n", fileSize);
 
   // seed rand
   srand(time(NULL));
 
-  int count = 0;
-  int res;
+  long long count = 0; // has to be u64 or will overflow
   long long rand_num;
+  int res;
   double perc;
+
+  // progress bar stuff
+  char s1[] = "##############################";
+  char s2[] = "..............................";
+
+  // time display
+  time_t start = time(0);
+  time_t now;
+  char buff_eta[100];
+  char buff_elapsed[100];
 
   while(count < fileSize) {
     do {
@@ -54,22 +59,28 @@ int main(int argc, char *argv[]) {
     fgetc(file); // returns something but dont care
     ++count;
 
-    // print percent status every 1k
-    perc = (count * 1.0 / fileSize * 1.0) * 100.0;
-    if (count % 1000 == 0) {
-      printf("Percent complete: %.*f%%\r", 2, perc);
+    if (count % 100000 == 0) {
+      // print percent status every 1k
+      perc = (count * 1.0 / fileSize * 1.0);
+      float perc_100 = perc * 100.0; // percent to display
+
+      now = time(0);
+      time_t diff = now - start;
+      float perc_left = 100 - perc_100;
+      time_t eta = (diff / perc_100) * perc_left;
+      strftime(buff_eta, 100, "%H:%M:%S", gmtime(&eta));
+      strftime(buff_elapsed, 100, "%H:%M:%S", gmtime(&diff));
+
+      printf("\rProgress: %6.*f%% [%.*s%.*s] ETA %s (%s elapsed)",
+        2, perc_100,
+        (int)(LOADING_WIDTH * perc), s1,
+        (int)(LOADING_WIDTH * (1 - perc)), s2,
+        buff_eta, buff_elapsed);
+      fflush(stdout);
     }
   }
 
-  // get time difference
-  // time_t end = time(0);
-  // time_t diff = difftime(end, start);
-
-  // format end time
-  // char buff_end[100];
-  // strftime(buff_end, 100, "%Y-%m-%dT%H:%M:%S", localtime(&end));
-  // printf("Finished reading file at %s (took %ld seconds)\n", buff_end, diff);
-  printf("Finished reading file.\n");
+  printf("\nFinished reading file.\n");
 
   return 0;
 }
