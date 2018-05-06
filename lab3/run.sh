@@ -67,7 +67,7 @@ run_test() {
     # run program, filter out percent complete status
     # output time command to /tmp/mtime.$$, not really safe but oh well in this case don't really care
     /usr/bin/time -f "real %e user %U sys %S" -a -o /tmp/mtime.$$ \
-      ./$1.o "${file_path}${2}.${file_suffix}" |& tee >(grep -v "Percent complete:" >> $log_file)
+      ./$1.o "${file_path}${2}.${file_suffix}" |& tee >(grep -v "Progress:" >> $log_file)
     # print time to stdout from time command
     tail -1 /tmp/mtime.$$
     printf "%s\n\n" "-----------------------" |& tee -a $log_file
@@ -77,7 +77,7 @@ run_test() {
   echo "Finished $1 read for $2 ($trials trials)" |& tee -a $log_file
   # print out average data and standard deviation for real time
   awk '{ et += $2; ut += $4; st += $6; count++; sum+=$2; sumsq+=$2*$2 } END \
-    {  printf "\033[1;32mAverage: real %.3f ± %.3f user %.3f sys %.3f\033[0m\n", \
+    {  printf "\033[1;32mAverage: real (mean ± σ): %.3f ± %.3f [user %.3f sys %.3f]\033[0m\n", \
     et/count, sqrt(sumsq/NR - (sum/NR)**2), ut/count, st/count }' /tmp/mtime.$$ |& tee -a $log_file
   printf "%s\n\n" "=======================" |& tee -a $log_file
   # delete mtime file
