@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 int main(int argc, char *argv[]) {
   // check args
@@ -23,27 +22,13 @@ int main(int argc, char *argv[]) {
   long long fileSize = ftell(file);
   fseek(file, 0L, SEEK_SET);
 
-  // format start time
-  // time_t start = time(0);
-  // char buff_start[100];
-  // strftime(buff_start, 100, "%Y-%m-%dT%H:%M:%S", localtime(&start));
-
-  // print size / start time
-  // printf("Attempting to read a %lld byte file sequentially at %s.\n", fileSize, buff_start);
   printf("Attempting to read a %lld byte file sequentially.\n", fileSize);
 
   // read file
   int count = 0;
   while(fgetc(file) != EOF) {}
 
-  // get time difference
-  // time_t end = time(0);
-  // time_t diff = difftime(end, start);
-
-  // format end time
-  // char buff_end[100];
-  // strftime(buff_end, 100, "%Y-%m-%dT%H:%M:%S", localtime(&end));
-  // printf("Finished reading file at %s (took %ld seconds)\n", buff_end, diff);
+  // finished
   printf("Finished reading file.\n");
 
   return 0;
