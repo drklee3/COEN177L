@@ -61,15 +61,15 @@ Times in seconds, each file run with 3 trials.
 
 ```text
 1G
- Time:   real (mean ± σ): 6.283 ± 0.047 [user 6.043 sys 0.233]
-Range:       (min … max):  6.25  … 6.35
+ Time:   real (mean ± σ):  6.283 ±  0.047 [user 6.043 sys 0.233]
+Range:       (min … max):  6.25  …  6.35
 
 2.5G
- Time:   real (mean ± σ): 15.170 ± 0.051 [user 14.637 sys 0.527]
+ Time:   real (mean ± σ): 15.170 ±  0.051 [user 14.637 sys 0.527]
 Range:       (min … max): 15.12  … 15.24
 
 5G
- Time:   real (mean ± σ): 30.827 ± 0.161 [user 29.733 sys 1.090]
+ Time:   real (mean ± σ): 30.827 ±  0.161 [user 29.733 sys 1.090]
 Range:       (min … max): 30.60  … 30.96
 ```
 
@@ -77,13 +77,16 @@ Range:       (min … max): 30.60  … 30.96
 
 ```text
 1G
-
+ Time:   real (mean ± σ):  1280.710 ±   36.772 [user 214.317 sys 1066.507]
+Range:       (min … max):  1235.500 … 1325.570
 
 2.5G
-
+ Time:   real (mean ± σ):  3280.583 ±  130.395 [user 551.370 sys 2729.470]
+Range:       (min … max):  3171.080 … 3463.830
 
 5G
-
+ Time:   real (mean ± σ):  6390.163 ±   36.237 [user 1047.047 sys 5343.670]
+Range:       (min … max):  6357.670 … 6440.730
 ```
 
 * use wallclock time
