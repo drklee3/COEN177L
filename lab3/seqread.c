@@ -25,7 +25,6 @@ int main(int argc, char *argv[]) {
   printf("Attempting to read a %lld byte file sequentially.\n", fileSize);
 
   // read file
-  int count = 0;
   while(fgetc(file) != EOF) {}
 
   // finished
