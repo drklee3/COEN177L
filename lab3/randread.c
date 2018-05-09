@@ -33,9 +33,8 @@ int main(int argc, char *argv[]) {
   srand(time(NULL));
 
   long long count = 0; // has to be u64 or will overflow
-  long long rand_num;
-  int       res;
-  double    perc;
+  long long rand_num;  // u64 to be large enough for file size
+  int       res;  // response code of fseek, just returns an int
 
   // progress bar stuff
   char s1[] = "##############################";
@@ -46,17 +45,18 @@ int main(int argc, char *argv[]) {
   time_t now;
   time_t diff;
   time_t last_diff;
+  double perc;
   char   buff_eta[100];
   char   buff_elapsed[100];
 
   while(count < fileSize) {
     do {
       // generate random u64 number
-      rand_num = rand();
-      rand_num = (rand_num << 32) | rand();
+      rand_num = rand();                    // upper bits
+      rand_num = (rand_num << 32) | rand(); // lower bits
       // seek to random position
       res = fseek(file, rand_num % fileSize, SEEK_SET);
-      // retry if fseek failed
+      // retry if fseek failed, non zero number on fail
     } while(res);
     fgetc(file); // returns something but dont care
     ++count;
