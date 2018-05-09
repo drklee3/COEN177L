@@ -74,8 +74,6 @@ Range:       (min … max): 15.12  … 15.24
  Time:   real (mean ± σ): 30.827 ±  0.161 [user 29.733 sys 1.090]
 Range:       (min … max): 30.60  … 30.96
  Rate:              mean: 166.088 MB/s
-
-Rate
 ```
 
 ### Random
