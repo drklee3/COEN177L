@@ -74,7 +74,7 @@ run_test() {
   done
   # finished running file n trials
   echo "=======================" |& tee -a $log_file
-  echo "Finished $1 read for $2 ($trials trials)" |& tee -a $log_file
+  echo "Finished $1 for $2 ($trials trials)" |& tee -a $log_file
   # print out average data and standard deviation for real time
   awk 'BEGIN {min=max=""} \
     /^real/ { \
