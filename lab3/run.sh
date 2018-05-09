@@ -14,6 +14,8 @@ file_sizes_bytes=( 1073000000 2620000000 5368000000 )
 # pretty file sizes
 file_list=( "1G" "2.5G" "5G" )
 
+trap "exit" INT
+
 # generate files
 gen_files() {
   echo "Generating random files in $file_path"
