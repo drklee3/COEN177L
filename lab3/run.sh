@@ -117,7 +117,7 @@ usage() {
 }
 
 # parse input flags
-while getopts "rsScht:p:" flag; do
+while getopts "rsScht:p:o:" flag; do
   case $flag in
     r) run_seq="false" ;;
     s) run_rand="false" ;;
@@ -126,6 +126,7 @@ while getopts "rsScht:p:" flag; do
     h) usage ;;
     t) trials=${OPTARG} ;;
     p) file_path="${OPTARG}" ;;
+    o) file_suffix="${OPTARG}" ;;
     *) echo "Unexpected option ${flag}"; exit 2;;
   esac
 done
