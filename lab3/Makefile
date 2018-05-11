@@ -15,4 +15,4 @@ clean:
 	-rm -f *.tar
 
 submit:
-	-tar -cvf lab.tar *.c Makefile README.md
+	-tar -cvf lab.tar --exclude=*.o --exclude=.git/ .
