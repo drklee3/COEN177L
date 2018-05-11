@@ -3,6 +3,7 @@
 ## Usage
 
 You can use the `run.sh` script to generate random files, compile, and run the trials.
+This will create a file `ouput.log` which contains individual trial data.  
 
 ```text
 # make run.sh executable
