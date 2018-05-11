@@ -98,7 +98,11 @@ Range:       (min … max):  6357.670 … 6440.730
 As shown above, sequential reads were much faster than random reads.
 The file sizes did not make a difference in speed, as it was consistent for each file for both sequential and random reads. Sequential reads averaged around 165.94 MB/s read speed, which is around the max typical speed of a hard drive. However random reads averaged 0.797 MB/s reads, which are much slower.
 
-Since these tests were run on mechanical hard drives, there were physical differences between the two sequential and random reads. For sequential reads, all the data should be all in a "row." The drive head would not have to reposition itself to read the next byte as the next byte would be in the next position. For random reads, since we use `fseek()` to a random offset, the drive head would have reposition to the new spot for every byte read. In comparason to CPU work done, the hard drive doing I/O has much higher latency and low IOPs, thus takes much longer. There may also have been more latency due to the thread switching between the library function calls such as `fseek()` and `fgetc()` and the user-level process, as well as potential overhead from context switching and interrupt handling from the I/O request from the functions above. The actual portions of the time caused by hardware or operating system may be difficult to determine with only the current data.
+Since these tests were run on mechanical hard drives, there were physical differences between the two sequential and random reads. For sequential reads, all the data should be all in a "row." The drive head would not have to reposition itself to read the next byte as the next byte would be in the next position.
+
+For random reads, since we use `fseek()` to a random offset, the drive head would have reposition to the new spot for every byte read. In comparason to CPU work done, the hard drive doing I/O has much higher latency and low IOPs, thus takes much longer.
+
+There may also have been more latency due to the thread switching between the library function calls such as `fseek()` and `fgetc()` and the user-level process, as well as potential overhead from context switching and interrupt handling from the I/O request from the functions above. The actual portions of the time caused by hardware or operating system may be difficult to determine with only the current data.
 
 * use wallclock time
 * run each file 3 times for both rand/seqread
