@@ -113,8 +113,8 @@ Sequential reads may seemingly have a system call every byte as we are calling `
 
 ```c
 #define _IO_getc_unlocked(_fp) \
-  ( ( (_fp)->_IO_read_ptr >= (_fp)->_IO_read_end ) \
-    ? __uflow(_fp) : *(unsigned char *)(_fp)->_IO_read_ptr++) )
+  (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
+     ? __uflow (_fp) : *(unsigned char *) (_fp)->_IO_read_ptr++)
 ```
 
 This shows that not all `fgetc()` calls actually require I/O as it reads from a buffer and refills it with `__uflow(_fp)` when the pointer is past the buffer. This works well for sequential reads, allowing a minimal amount of system calls despite reading "byte by byte" in the user code by buffering I/O. This is contrasted with random reads where it may require a system call in order to seek to a different location of the file first with `fseek()` and the new location may not have the require byte buffered. There is likely also caching for `fseek()`, but due to the large file sizes at hand, it is also likely that the target positions are outside the buffers for both seeking and reading.
