@@ -2,51 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
-
-/**
- * Gets the index of an item in array
- * 
- * @param cache array to search in
- * @param target item to search for
- * @return int Index of item, -1 if not found.
- */
-int indexOf(int cache[], size_t size, int target) {
-  for (int i = 0; i < size; ++i) {
-    if (cache[i] == target) {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
-/**
- * Removes an item from an array
- * 
- * @param cache array to remove from
- * @param index index of array item to remove
- * @return int 0 on success, 1 if index out of bounds
- */
-int removeIndex(int cache[], size_t size, int index) {
-  if (index > size) {
-    return 1;
-  }
-
-  for (int i = index; i < size - 1; ++i) {
-    // shift all items forward
-    cache[i] = cache[i + 1];
-  }
-
-  return 0;
-}
-
-void printArray(int cache[], size_t size) {
-  printf("size: %ld [", size);
-  for(int i = 0; i < size; i++) {
-    printf("%d, ", cache[i]);
-  }
-  printf("]\n");
-}
+#include "util.h"
 
 int main(int argc, char *argv[]) {
   // check args
@@ -103,6 +59,7 @@ int main(int argc, char *argv[]) {
         return 1;
       }
 
+      // print out page that caused page fault
       if (dist > page_frames) {
         printf("Page fault: %d\n", input);
       }
@@ -117,7 +74,6 @@ int main(int argc, char *argv[]) {
 
     printArray(cache, cache_size);
     printArray(distances, distances_size);
-    // if not in array output page number that results in page fault
   }
 
   return 0;

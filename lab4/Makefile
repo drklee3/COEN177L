@@ -1,14 +1,15 @@
 CC = gcc
 CFLAGS = -std=c99
+HEADERS = util.h util.c
 SRCS = $(wildcard *.c)
 PROGS = $(patsubst %.c,%,$(SRCS))
 
 .PHONY: default clean submit
-default: lru
+default: main
 all: $(PROGS)
 
-%: %.c
-	$(CC) $(CFLAGS) $< -o $@.o
+%: %.c $(HEADERS)
+	$(CC) $(CFLAGS) $< $(HEADERS) -o $@.o
 
 clean:
 	-rm -f *.o
