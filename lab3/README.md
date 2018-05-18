@@ -109,12 +109,26 @@ Aside from physical differences, there may also have been more latency due to th
 
 The cause of process time difference may also be seen in the user and sys times in the results above, sequential reads had an average of 3.57% sys time (of sys + user time) while random reads had 83.70% (average user and sys times calculated from a single trial from each 1G, 2.5G, 5G). Random reads had a much higher percentage in system time, which meant a majority of the time was spent in system calls inside the kernel compared to sequential reads which had most of the time in user-mode code inside the user process (seqread.c/o). There were many more actions done by the random read program that could not be done in user mode to access hardware, in this case the HDD via the functions mentioned previously. This would have to be done for every byte resulting in more system traps to switch from user to kernel mode in order to execute the system instructions causing more overhead.
 
-Sequential reads may seemingly have a system call every byte as we are calling `fgetc()` until it reaches EOF, so why is it much faster than random reads? First of all, `fgetc()` both gets a character (1 byte) from the file stream and the file pointer is moved to the next character. Since we are reading single bytes until the file ends, it should be the same number of loops as the random reads. However, there are not system calls and I/O done for every single `fgetc()` call. Looking at the implementation of `fgetc()` (glibc), it contains the following macro after acquiring an I/O lock:
+Sequential reads may seemingly have a system call every byte as we are calling `fgetc()` until it reaches EOF, so why is it much faster than random reads? First of all, `fgetc()` both gets a character (1 byte) from the file stream and the file pointer is moved to the next character. Since we are reading single bytes until the file ends, it should be the same number of loops as the random reads. However, there are not system calls and I/O done for every single `fgetc()` call. Looking at the implementation of `fgetc()` (glibc):
 
 ```c
+// getc implementation, weak_aliased to fgetc
+int
+_IO_getc (fp)
+     FILE *fp;
+{
+  int result;
+  CHECK_FILE (fp, EOF);
+  _IO_acquire_lock (fp);
+  result = _IO_getc_unlocked (fp);
+  _IO_release_lock (fp);
+  return result;
+}
+
+// getc macro
 #define _IO_getc_unlocked(_fp) \
   (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
      ? __uflow (_fp) : *(unsigned char *) (_fp)->_IO_read_ptr++)
 ```
 
-This shows that not all `fgetc()` calls actually require I/O as it reads from a buffer and refills it with `__uflow(_fp)` when the pointer is past the buffer. This works well for sequential reads, allowing a minimal amount of system calls despite reading byte by byte in the user code by buffering I/O. This is contrasted with random reads where it may require a system call in order to seek to a different location of the file first with `fseek()` and the new location may not have the required byte buffered. There is likely also caching for `fseek()`, but due to the large file sizes at hand, it is also likely that the target positions are outside the buffers for both seeking and reading. This relates back to the low sys time sequential reads had compared to user time, less time was spent in the kernel due to caching while random reads had much more time in kernel likely due to not being able to take advantage of caching nearly as much if at all.
+In the macro above, it shows that not all `fgetc()` calls actually require I/O as it reads from a buffer and refills it with `__uflow(_fp)` when the pointer is past the buffer. This works well for sequential reads, allowing a minimal amount of system calls despite reading byte by byte in the user code by buffering I/O. This is contrasted with random reads where it may require a system call in order to seek to a different location of the file first with `fseek()` and the new location may not have the required byte buffered. There is likely also caching for `fseek()`, but due to the large file sizes at hand, it is also likely that the target positions are outside the buffers for both seeking and reading. This relates back to the low sys time sequential reads had compared to user time, less time was spent in the kernel due to caching while random reads had much more time in kernel likely due to not being able to take advantage of caching nearly as much if at all.
