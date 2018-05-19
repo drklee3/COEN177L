@@ -29,3 +29,7 @@ second chance
 
 * first into memory reference bit = false
 * reference bit = true when accessed
+
+* graph of 3+
+* which one's better
+

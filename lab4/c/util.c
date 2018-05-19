@@ -39,6 +39,13 @@ int removeIndex(int cache[], size_t size, int index) {
   return 0;
 }
 
+/**
+ * Prints an array
+ *
+ * @param cache array to print
+ * @param size size of array
+ * @return void
+ */
 void printArray(int cache[], size_t size) {
   printf("size: %ld [", size);
   for(int i = 0; i < size; i++) {
