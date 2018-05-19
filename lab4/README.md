@@ -6,7 +6,7 @@
 # install rust (https://www.rust-lang.org/en-US/install.html)
 curl https://sh.rustup.rs -sSf | sh
 
-# default algorithm without specifying features is LRU
+# run each algorithm
 # the --release flag can be added for optimized builds
 cargo run [table size] --features=fifo
 cargo run [table size] --features=lru

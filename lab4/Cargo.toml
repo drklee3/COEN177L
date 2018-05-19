@@ -9,7 +9,7 @@ log = "0.4"
 chrono = "0.4"
 
 [features]
-default = ["lru"]
+default = []
 fifo = []
 lru = []
 second_chance = []
