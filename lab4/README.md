@@ -6,11 +6,11 @@
 # install rust (https://www.rust-lang.org/en-US/install.html)
 curl https://sh.rustup.rs -sSf | sh
 
-# run unoptimized + debuginfo
-cargo run [table size]
-
-# run optimized build (may compile a bit slower)
-cargo run [table size] --release
+# default algorithm without specifying features is LRU
+# the --release flag can be added for optimized builds
+cargo run [table size] --features=fifo
+cargo run [table size] --features=lru
+cargo run [table size] --features=second_chance
 ```
 
 The Basics
