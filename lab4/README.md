@@ -1,4 +1,17 @@
-# lab4 
+# lab4
+
+## Building
+
+```bash
+# install rust (https://www.rust-lang.org/en-US/install.html)
+curl https://sh.rustup.rs -sSf | sh
+
+# run unoptimized + debuginfo
+cargo run [table size]
+
+# run optimized build (may compile a bit slower)
+cargo run [table size] --release
+```
 
 The Basics
 The goal of this assignment is to gain experience with page replacement (and to a lesser extent, caching) algorithms. In this assignment your goal is to write programs that simulate page replacement algorithms. Your initial program is to accept at least one numeric command-line parameter, which it will use as the number of available page frames. 
