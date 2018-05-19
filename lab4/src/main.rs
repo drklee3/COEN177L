@@ -22,7 +22,6 @@ fn main() {
   util::setup_logger().expect("Failed to set up logging");
   info!("Using table size {}", table_size);
 
-  println!("Hello, world!");
   let mut page_request;
   let mut page_table_index = 0;
   let mut num_requests = 0;
