@@ -11,7 +11,8 @@ use error::{Error, Result};
 /// Sets up the logger
 pub fn setup_logger() -> Result<()> {
   let colors = ColoredLevelConfig::new()
-    .info(Color::Green);
+    .info(Color::BrightGreen)
+    .debug(Color::BrightCyan);
 
   fern::Dispatch::new()
     .format(move |out, message, record| {
@@ -35,11 +36,13 @@ pub fn setup_logger() -> Result<()> {
 pub fn parse_args() -> Result<usize> {
   let args: Vec<String> = std::env::args().collect();
 
-  if args.len() == 2 {
-    return args[1].parse::<usize>().map_err(From::from);
+  if args.len() != 2 {
+    return Err(Error::from("Missing argument for table size."));
   }
 
-  Err(Error::from("Missing argument for table size."))
+  args[1]
+    .parse::<usize>()
+    .map_err(From::from)
 }
 
 /// Checks if a page request is in the page table
