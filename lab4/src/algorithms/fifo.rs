@@ -8,16 +8,17 @@ pub struct Fifo {
 impl Fifo {
   /// Creates a new Fifo page table
   pub fn new(size: usize) -> Self {
+    info!("Using algorithm: FIFO");
     Fifo {
       table: Vec::with_capacity(size),
       size: size,
     }
   }
 
+  /// Handles a page request, returns true if page fault occurred
   pub fn handle_page_request(&mut self, page_request: u64) -> bool {
-    debug!("{:?}", self.table);
     if !self.table.contains(&page_request) {
-      println!("Page {} caused a page fault", page_request);
+      println!("Page fault: {}", page_request);
 
       // remove first page if over capacity
       if self.table.len() >= self.size {
@@ -26,10 +27,13 @@ impl Fifo {
 
       // push new page request
       self.table.push(page_request);
-
+      debug!("{:?}", self.table);
       return true;
     }
 
+    // we don't move existing page to beginning
+    // since that would be basically just lru?
+    debug!("{:?}", self.table);
     false
   }
 }

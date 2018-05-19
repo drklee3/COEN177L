@@ -26,10 +26,13 @@ fn main() {
   let mut page_request;
   let mut num_requests = 0;
   let mut num_misses = 0;
-  let mut page_table: Vec<u64> = Vec::with_capacity(table_size);
-
+  
   #[cfg(feature = "fifo")]
   let mut page_table = algorithms::fifo::Fifo::new(table_size);
+  #[cfg(feature = "lru")]
+  let mut page_table = algorithms::lru::Lru::new(table_size);
+  #[cfg(feature = "second_chance")]
+  let mut page_table = algorithms::second_chance::SecondChance::new(table_size);
 
   let stdin = io::stdin();
   for line in stdin.lock().lines() {
