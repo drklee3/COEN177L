@@ -1,3 +1,4 @@
+#[derive (Debug)]
 pub struct Fifo {
   /// Vec of page numbers
   table: Vec<u64>,

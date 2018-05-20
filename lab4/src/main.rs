@@ -31,19 +31,25 @@ fn simulate(table_size: usize, algorithm: &str) {
   for line in stdin.lock().lines() {
     let line = line.expect("Failed to read line from stdin");
     if let Ok(num) = line.parse::<u64>() {
-      // check if 0
+      // only use positive numbers
+      if num <= 0 {
+        continue;
+      }
       page_request = num;
     } else {
       continue;
     }
+
     num_requests += 1;
 
+    // run page replacement algorithms
     let res = match page_table {
       AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
       AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
       AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
     };
     
+    // check if resulted in page fault
     if res {
       num_misses += 1;
     }
@@ -106,15 +112,10 @@ fn main() {
     process::exit(1);
   }
 
+  // safe to unwrap, required & validated in clap
+  let algorithm = args.value_of("algorithm").unwrap();
+
   info!("Using table size {}", table_size);
-
-  let algorithm = match args.value_of("algorithm") {
-    Some(alg) => alg,
-    None => {
-      eprintln!("Invalid algorithm");
-      process::exit(1);
-    }
-  };
-
+  info!("Using page replacement algorithm {}", algorithm.to_uppercase());
   simulate(table_size, algorithm);
 }

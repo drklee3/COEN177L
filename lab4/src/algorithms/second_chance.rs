@@ -6,6 +6,7 @@ pub struct Page {
   referenced: bool,
 }
 
+#[derive (Debug)]
 pub struct SecondChance {
   /// Vec of page numbers
   table: Vec<Page>,
