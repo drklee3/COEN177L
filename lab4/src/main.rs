@@ -1,38 +1,31 @@
 #[macro_use] 
-extern crate log;
-extern crate fern;
-extern crate chrono;
+extern crate log;    // logging macros
+extern crate fern;   // logging formatter
+#[macro_use]
+extern crate clap;   // command line argument parser
+extern crate chrono; // time for logging
 
 use std::process;
 use std::io::{self, BufRead};
+use clap::{Arg, App, SubCommand};
 
 pub mod util;
 pub mod error;
 pub mod algorithms;
 
-fn main() {
-  // unwrap used here to panic
-  let table_size = match util::parse_args() {
-    Ok(size) => size,
-    Err(e) => {
-      eprintln!("Error: {}", e);
-      process::exit(1);
-    }
-  };
-  util::setup_logger().expect("Failed to set up logging");
+use algorithms::*;
 
-  info!("Using table size {}", table_size);
+fn simulate(table_size: usize, algorithm: &str) {
+  let mut page_table = match algorithm {
+    "fifo" => PageTable::new(table_size),
+    "lru" => PageTable::new(table_size),
+    "second_chance" => SecondChance::new(table_size),
+    _ => return,
+  };
 
   let mut page_request;
   let mut num_requests = 0;
   let mut num_misses = 0;
-  
-  #[cfg(feature = "fifo")]
-  let mut page_table = algorithms::fifo::Fifo::new(table_size);
-  #[cfg(feature = "lru")]
-  let mut page_table = algorithms::lru::Lru::new(table_size);
-  #[cfg(feature = "second_chance")]
-  let mut page_table = algorithms::second_chance::SecondChance::new(table_size);
 
   let stdin = io::stdin();
   for line in stdin.lock().lines() {
@@ -44,9 +37,15 @@ fn main() {
       continue;
     }
     num_requests += 1;
+
+    let res = match algorithm {
+      "fifo" => Fifo::handle_page_request(&mut page_table, page_request),
+      "lru" => Lru::handle_page_request(&mut page_table, page_request),
+      "second_chance" => SecondChance::handle_page_request(&mut page_table, page_request),
+      _ => return,
+    };
     
-    
-    if page_table.handle_page_request(page_request) {
+    if res {
       num_misses += 1;
     }
   }
@@ -54,4 +53,65 @@ fn main() {
   let num_hits = num_requests - num_misses;
   let hit_rate = num_hits as f64 / num_requests as f64;
   info!("Hit rate: {:.3}",  hit_rate);
+}
+
+fn main() {
+  let matches = App::new("page-replacements")
+    .version(crate_version!())
+    .author(crate_authors!())
+    .about("Simulates various page replacement algorithms")
+    .arg(Arg::with_name("table_size")
+      .help("Sets the page table size")
+      .required(true)
+      .index(1)
+    )
+    .arg(Arg::with_name("v")
+      .short("v")
+      .multiple(true)
+      .help("Sets the level of verbosity")
+    )
+    .arg(Arg::with_name("algorithm")
+      .short("a")
+      .long("algorithm")
+      .help("Sets the page replacement algorithm to use")
+      .required(true)
+      .takes_value(true)
+      .possible_values(&["fifo", "lru", "second_chance"])
+    )
+    .get_matches();
+
+  let table_size = match matches
+    .value_of("table_size")
+    .and_then(|x| x.parse::<usize>().ok()) {
+    Some(size) => size,
+    None => {
+      eprintln!("Error: invalid table size");
+      process::exit(1);
+    }
+  };
+
+  if let Err(e) = util::setup_logger() {
+    eprintln!("Error setting up logging: {}", e);
+    process::exit(1);
+  }
+
+  info!("Using table size {}", table_size);
+
+  let algorithm = match matches.value_of("algorithm") {
+    Some(alg) => alg,
+    None => {
+      eprintln!("Invalid algorithm");
+      process::exit(1);
+    }
+  };
+
+  // Conditional compilations based on which paging algorithm feature is enabled
+  #[cfg(feature = "fifo")]
+  let mut page_table = algorithms::PageTable::new(table_size);
+  #[cfg(feature = "lru")]
+  let mut page_table = lru::Lru::new(table_size);
+  #[cfg(feature = "second_chance")]
+  let mut page_table = second_chance::SecondChance::new(table_size);
+
+  simulate(table_size, algorithm);
 }

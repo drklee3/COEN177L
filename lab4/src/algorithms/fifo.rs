@@ -1,22 +1,21 @@
-pub struct Fifo {
-  /// Vec of page numbers
-  table: Vec<u64>,
-  /// Size of page table
-  size: usize,
+use algorithms::PageTable;
+
+pub trait Fifo {
+  fn new(size: usize) -> Self;  
+  fn handle_page_request(&mut self, page_request: u64) -> bool;
 }
 
-impl Fifo {
-  /// Creates a new Fifo page table
-  pub fn new(size: usize) -> Self {
-    info!("Using algorithm: FIFO");
-    Fifo {
-      table: Vec::with_capacity(size),
+impl Fifo for PageTable<u64> {
+  fn new(size: usize) -> Self {
+    let table: Vec<u64> = Vec::with_capacity(size);
+    PageTable {
+      table,
       size: size,
     }
   }
 
   /// Handles a page request, returns true if page fault occurred
-  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
+  fn handle_page_request(&mut self, page_request: u64) -> bool {
     if !self.table.contains(&page_request) {
       println!("Page fault: {}", page_request);
 
