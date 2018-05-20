@@ -44,8 +44,3 @@ pub fn parse_args() -> Result<usize> {
     .parse::<usize>()
     .map_err(From::from)
 }
-
-/// Checks if a page request is in the page table
-pub fn is_in_memory(request: u64, page_table: &Vec<u64>) -> bool {
-  page_table.contains(&request)
-}
