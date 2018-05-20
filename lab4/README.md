@@ -5,12 +5,36 @@
 ```bash
 # install rust (https://www.rust-lang.org/en-US/install.html)
 curl https://sh.rustup.rs -sSf | sh
+# compile optimized build
+cargo build --release
+```
 
-# run each algorithm
-# the --release flag can be added for optimized builds
-cargo run [table size] --features=fifo
-cargo run [table size] --features=lru
-cargo run [table size] --features=second_chance
+## Usage
+```text
+USAGE:
+    page-replacements [FLAGS] <table_size> --algorithm <algorithm>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    -v               Sets the level of verbosity
+
+OPTIONS:
+    -a, --algorithm <algorithm>    Sets the page replacement algorithm to use [possible values: fifo, lru,
+                                   second_chance]
+
+ARGS:
+    <table_size>     Sets the page table size
+```
+
+## Examples
+
+```bash
+# run lru with page table size of 10
+./target/release/page-replacements 10 -a lru
+
+# run lru show debug info (prints array / page table contents for each input)
+./target/release/page-replacements 10 -a lru -v
 ```
 
 The Basics
