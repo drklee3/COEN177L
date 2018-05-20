@@ -9,12 +9,23 @@ use std;
 use error::{Error, Result};
 
 /// Sets up the logger
-pub fn setup_logger() -> Result<()> {
+pub fn setup_logger(verbosity: u64) -> Result<()> {
   let colors = ColoredLevelConfig::new()
     .info(Color::BrightGreen)
     .debug(Color::BrightCyan);
+  
+  let mut base_config = fern::Dispatch::new();
 
-  fern::Dispatch::new()
+  base_config = match verbosity {
+    0 => base_config
+      .level(log::LevelFilter::Info),
+    1 => base_config
+      .level(log::LevelFilter::Debug),
+    _2_or_more => base_config
+      .level(log::LevelFilter::Trace),
+  };
+
+  base_config
     .format(move |out, message, record| {
       out.finish(format_args!(
         "{}[{}][{}] {}",
@@ -24,7 +35,6 @@ pub fn setup_logger() -> Result<()> {
         message
       ))
     })
-    .level(log::LevelFilter::Debug)
     .chain(std::io::stderr())
     .chain(fern::log_file("output.log")?)
     .apply()?;
