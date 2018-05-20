@@ -12,7 +12,8 @@ use error::{Error, Result};
 pub fn setup_logger(verbosity: u64) -> Result<()> {
   let colors = ColoredLevelConfig::new()
     .info(Color::BrightGreen)
-    .debug(Color::BrightCyan);
+    .debug(Color::BrightCyan)
+    .trace(Color::BrightMagenta);
   
   let mut base_config = fern::Dispatch::new();
 
