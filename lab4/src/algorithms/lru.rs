@@ -1,21 +1,20 @@
-use algorithms::PageTable;
-
-pub trait Lru {
-  fn new(size: usize) -> Self;
-  fn handle_page_request(&mut self, page_request: u64) -> bool;
+pub struct Lru {
+  /// Vec of page numbers
+  table: Vec<u64>,
+  /// Size of page table
+  size: usize,
 }
 
-impl Lru for PageTable<u64> {
-  fn new(size: usize) -> Self {
-    let table: Vec<u64> = Vec::with_capacity(size);
-    PageTable {
-      table,
+impl Lru {
+  pub fn new(size: usize) -> Self {
+    Lru {
+      table: Vec::with_capacity(size),
       size: size,
     }
   }
 
   /// Handles a page request, returns true if page fault occurred
-  fn handle_page_request(&mut self, page_request: u64) -> bool {
+  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
     if !self.table.contains(&page_request) {
       println!("Page fault: {}", page_request);
 

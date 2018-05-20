@@ -1,7 +1,7 @@
 [package]
 name = "page-replacements"
 version = "0.1.0"
-authors = ["drklee3 <dlee3@scu.edu>"]
+authors = ["Derrick Lee <dlee3@scu.edu>"]
 
 [dependencies]
 fern = { version = "0.5", features = ["colored"] }

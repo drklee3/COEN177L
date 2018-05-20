@@ -1,5 +1,3 @@
-use algorithms::PageTable;
-
 #[derive (Debug, Clone)]
 pub struct Page {
   /// Page number
@@ -8,31 +6,23 @@ pub struct Page {
   referenced: bool,
 }
 
-/*
 pub struct SecondChance {
   /// Vec of page numbers
   table: Vec<Page>,
   /// Size of page table
   size: usize,
 }
-*/
 
-pub trait SecondChance {
-  fn new(size: usize) -> Self;
-  fn handle_page_request(&mut self, page_request: u64) -> bool;
-}
-
-impl SecondChance for PageTable<u64> {
-  fn new(size: usize) -> Self {
-    let table: Vec<Page> = Vec::with_capacity(size);
-    PageTable {
-      table,
+impl SecondChance {
+  pub fn new(size: usize) -> Self {
+    SecondChance {
+      table: Vec::with_capacity(size),
       size: size,
     }
   }
 
   /// Handles a page request, returns true if page fault occurred
-  fn handle_page_request(&mut self, page_request: u64) -> bool {
+  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
     // search if contains, use any() to search with struct field
     if !self.table.iter().any(|x| x.number == page_request) {
       println!("Page fault: {}", page_request);

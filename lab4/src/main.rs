@@ -7,7 +7,7 @@ extern crate chrono; // time for logging
 
 use std::process;
 use std::io::{self, BufRead};
-use clap::{Arg, App, SubCommand};
+use clap::{Arg, App};
 
 pub mod util;
 pub mod error;
@@ -17,9 +17,9 @@ use algorithms::*;
 
 fn simulate(table_size: usize, algorithm: &str) {
   let mut page_table = match algorithm {
-    "fifo" => PageTable::new(table_size),
-    "lru" => PageTable::new(table_size),
-    "second_chance" => SecondChance::new(table_size),
+    "fifo" => AlgorithmType::Fifo(Fifo::new(table_size)),
+    "lru" => AlgorithmType::Lru(Lru::new(table_size)),
+    "second_chance" => AlgorithmType::SecondChance(SecondChance::new(table_size)),
     _ => return,
   };
 
@@ -38,11 +38,10 @@ fn simulate(table_size: usize, algorithm: &str) {
     }
     num_requests += 1;
 
-    let res = match algorithm {
-      "fifo" => Fifo::handle_page_request(&mut page_table, page_request),
-      "lru" => Lru::handle_page_request(&mut page_table, page_request),
-      "second_chance" => SecondChance::handle_page_request(&mut page_table, page_request),
-      _ => return,
+    let res = match page_table {
+      AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
+      AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
+      AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
     };
     
     if res {
@@ -56,7 +55,8 @@ fn simulate(table_size: usize, algorithm: &str) {
 }
 
 fn main() {
-  let matches = App::new("page-replacements")
+  // parse args
+  let args = App::new("page-replacements")
     .version(crate_version!())
     .author(crate_authors!())
     .about("Simulates various page replacement algorithms")
@@ -64,8 +64,21 @@ fn main() {
       .help("Sets the page table size")
       .required(true)
       .index(1)
+      .validator(|size| {
+        if let Ok(parsed) = size.parse::<usize>() {
+          if parsed <= 0 {
+            // don't think we can get negative numbers so this is
+            // mainly just a check for 0
+            return Err("Please give a number over 0".into());
+          }
+        } else {
+          return Err("Please give a number".into());
+        }
+
+        Ok(())
+      })
     )
-    .arg(Arg::with_name("v")
+    .arg(Arg::with_name("verbose")
       .short("v")
       .multiple(true)
       .help("Sets the level of verbosity")
@@ -79,39 +92,29 @@ fn main() {
       .possible_values(&["fifo", "lru", "second_chance"])
     )
     .get_matches();
-
-  let table_size = match matches
+  
+  // parse table size
+  let table_size = args
     .value_of("table_size")
-    .and_then(|x| x.parse::<usize>().ok()) {
-    Some(size) => size,
-    None => {
-      eprintln!("Error: invalid table size");
-      process::exit(1);
-    }
-  };
+    .and_then(|x| x.parse::<usize>().ok())
+    .unwrap(); // ok to unwrap here, input already validated in clap
+  
+  let verbosity: u64 = args.occurrences_of("verbose");
 
-  if let Err(e) = util::setup_logger() {
+  if let Err(e) = util::setup_logger(verbosity) {
     eprintln!("Error setting up logging: {}", e);
     process::exit(1);
   }
 
   info!("Using table size {}", table_size);
 
-  let algorithm = match matches.value_of("algorithm") {
+  let algorithm = match args.value_of("algorithm") {
     Some(alg) => alg,
     None => {
       eprintln!("Invalid algorithm");
       process::exit(1);
     }
   };
-
-  // Conditional compilations based on which paging algorithm feature is enabled
-  #[cfg(feature = "fifo")]
-  let mut page_table = algorithms::PageTable::new(table_size);
-  #[cfg(feature = "lru")]
-  let mut page_table = lru::Lru::new(table_size);
-  #[cfg(feature = "second_chance")]
-  let mut page_table = second_chance::SecondChance::new(table_size);
 
   simulate(table_size, algorithm);
 }

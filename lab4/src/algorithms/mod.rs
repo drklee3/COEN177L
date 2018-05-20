@@ -8,26 +8,19 @@ pub use lru::Lru;
 pub use second_chance::SecondChance;
 pub use second_chance::Page;
 
+/// Enum to hold the different types of page replacement algorithms
 pub enum AlgorithmType {
-  Fifo,
-  Lru,
-  SecondChance,
+  Fifo(Fifo),
+  Lru(Lru),
+  SecondChance(SecondChance),
 }
 
+/*
+// Could use generic struct but conditional traits are too hard idk
 pub struct PageTable<T> {
   /// Vec of page numbers
   table: Vec<T>,
   /// Size of page table
   size: usize,
 }
-
-impl<T> PageTable<T> {
-  pub fn new(size: usize) -> Self {
-    let table: Vec<T> = Vec::with_capacity(size);
-
-    PageTable {
-      table,
-      size: size,
-    }
-  }
-}
+*/
