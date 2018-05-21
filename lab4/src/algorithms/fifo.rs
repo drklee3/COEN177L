@@ -11,7 +11,7 @@ pub struct Fifo {
 impl Fifo {
   pub fn new(size: usize) -> Self {
     Fifo {
-      table: vec![0; size],
+      table: vec![0; size], // initialize vec with size 0s
       size: size,
       index: 0,
     }
@@ -22,11 +22,11 @@ impl Fifo {
     if !self.table.contains(&page_request) {
       println!("Page {} caused a page fault", page_request);
 
-      if let Some(elem) = self.table.get_mut(self.index) {
+      // safe to unwrap, self.index should never go >= len 
+      {
+        let elem = self.table.get_mut(self.index).unwrap();
         trace!("Modified {} -> {} at index {}", *elem, page_request, self.index);
         *elem = page_request;
-      } else {
-        unreachable!();
       }
 
       self.index = (self.index + 1) % self.size;
