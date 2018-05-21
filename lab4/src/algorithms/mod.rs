@@ -6,7 +6,6 @@ pub mod second_chance;
 pub use fifo::Fifo;
 pub use lru::Lru;
 pub use second_chance::SecondChance;
-pub use second_chance::Page;
 
 /// Enum to hold the different types of page replacement algorithms
 pub enum AlgorithmType {
