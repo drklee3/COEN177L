@@ -1,3 +1,4 @@
+/// A page table entry for FIFO page replacement
 #[derive (Debug)]
 pub struct Fifo {
   /// Vec of page numbers

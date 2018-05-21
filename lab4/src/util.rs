@@ -1,12 +1,14 @@
-use fern;
-use fern::colors::{
-  Color,
-  ColoredLevelConfig,
+use chrono;
+use error::{Error, Result};
+use fern::{
+  self,
+  colors::{
+    Color,
+    ColoredLevelConfig,
+  }
 };
 use log;
-use chrono;
 use std;
-use error::{Error, Result};
 
 /// Sets up the logger
 pub fn setup_logger(verbosity: u64) -> Result<()> {

@@ -1,11 +1,12 @@
+use log::SetLoggerError;
+use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
-use std::error::Error as StdError;
 use std::io::Error as IoError;
 use std::num::ParseIntError;
-use log::SetLoggerError;
 
 /// Common result type used throughout the program.
+/// There aren't really many possible errors though.
 pub type Result<T> = StdResult<T, Error>;
 
 /// Common error type used throughout the program, to be used as a holder for

@@ -10,6 +10,7 @@ cargo build --release
 ```
 
 ## Usage
+
 ```text
 USAGE:
     page-replacements [FLAGS] <table_size> --algorithm <algorithm>
@@ -34,8 +35,10 @@ ARGS:
 cat accesses.txt | ./target/release/page-replacements 10 -a lru
 
 # run lru show debug info (prints array / page table contents for each input)
-# probably not a good idea to run this with accesses.txt
+# probably not a good idea to use -v with accesses.txt or large table sizes
 # for second chance: blue = referenced, red = unreferenced
+# multiple instances of the v flag can be used to increase log level:
+# use -vv to display additional information
 ./target/release/page-replacements 10 -a lru -v
 ```
 

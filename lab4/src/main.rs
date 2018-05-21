@@ -1,17 +1,19 @@
 #[macro_use]
-extern crate log;    // logging macros
-extern crate fern;   // logging formatter
-#[macro_use]
 extern crate clap;   // command line argument parser
+#[macro_use]
+extern crate log;    // logging macros
+
 extern crate chrono; // time for logging
+extern crate fern;   // logging formatter
+extern crate csv;    // csv writer for output data
 
-use std::process;
-use std::io::{self, BufRead};
 use clap::{Arg, App};
+use std::io::{self, BufRead};
+use std::process;
 
-pub mod util;
-pub mod error;
 pub mod algorithms;
+pub mod error;
+pub mod util;
 
 use algorithms::*;
 
@@ -42,7 +44,7 @@ fn simulate(table_size: usize, algorithm: &str) {
 
     num_requests += 1;
 
-    // run page replacement algorithms
+    // run corresponding page replacement algorithms
     let res = match page_table {
       AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
       AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
@@ -57,7 +59,8 @@ fn simulate(table_size: usize, algorithm: &str) {
 
   let num_hits = num_requests - num_misses;
   let hit_rate = num_hits as f64 / num_requests as f64;
-  println!("Hit rate: {:.3}",  hit_rate);
+  debug!("Hits: {} / {}", num_hits, num_requests);
+  println!("Hit rate: {:.5}",  hit_rate);
 }
 
 fn main() {
@@ -97,6 +100,12 @@ fn main() {
       .takes_value(true)
       .possible_values(&["fifo", "lru", "second_chance", "sc"])
     )
+    .arg(Arg::with_name("output")
+      .short("o")
+      .long("output")
+      .help("Sets the output csv file to write results to")
+      .takes_value(true)
+    )
     .get_matches();
   
   // parse table size
@@ -106,7 +115,6 @@ fn main() {
     .unwrap(); // ok to unwrap here, input already validated in clap
   
   let verbosity: u64 = args.occurrences_of("verbose");
-
   if let Err(e) = util::setup_logger(verbosity) {
     eprintln!("Error setting up logging: {}", e);
     process::exit(1);
@@ -115,7 +123,7 @@ fn main() {
   // safe to unwrap, required & validated in clap
   let algorithm = args.value_of("algorithm").unwrap();
 
-  info!("Using table size {}", table_size);
-  info!("Using page replacement algorithm {}", algorithm.to_uppercase());
+  info!("Using page replacement algorithm {} for table size {}",
+    algorithm.to_uppercase(), table_size);
   simulate(table_size, algorithm);
 }

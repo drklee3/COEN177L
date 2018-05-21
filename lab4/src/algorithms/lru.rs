@@ -1,5 +1,6 @@
 use std::fmt;
 
+/// A page table entry for LRU page replacement
 #[derive (Clone)]
 pub struct LruPage {
   /// Page number
@@ -9,6 +10,7 @@ pub struct LruPage {
 }
 
 impl LruPage {
+  /// Creates a new LRU page
   fn new() -> Self {
     LruPage {
       number: 0,
@@ -23,16 +25,18 @@ impl fmt::Debug for LruPage {
   }
 }
 
+/// A page table for LRU page replacement
 #[derive (Debug)]
 pub struct Lru {
   /// Vec of page numbers
   table: Vec<LruPage>,
   /// Size of page table
   size: usize,
-  /// Index position
-  index: usize,
+  /// Current "time"
+  time: u64,
 }
 
+/// A helper struct to store page table min/max values/indexes
 pub struct PageMinMax {
   /// Max "time" value of a page
   min: u64,
@@ -46,6 +50,7 @@ pub struct PageMinMax {
 }
 
 impl PageMinMax {
+  /// Creates a new PageMinMax
   fn new() -> Self {
     PageMinMax {
       min: <u64>::max_value(),
@@ -57,6 +62,7 @@ impl PageMinMax {
 }
 
 impl Lru {
+  /// Creates a new page table for LRU
   pub fn new(size: usize) -> Self {
     Lru {
       table: vec![LruPage::new(); size],
@@ -85,6 +91,7 @@ impl Lru {
         acc
       });
 
+    // search if in memory / page table
     if !self.table.iter().any(|x| x.number == page_request) {
       println!("Page {} caused a page fault", page_request);
 

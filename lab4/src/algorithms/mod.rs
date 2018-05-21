@@ -2,7 +2,7 @@ pub mod fifo;
 pub mod lru;
 pub mod second_chance;
 
-// trait reexports
+// struct reexports
 pub use fifo::Fifo;
 pub use lru::Lru;
 pub use second_chance::SecondChance;
