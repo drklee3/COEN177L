@@ -56,3 +56,12 @@ pub fn parse_args() -> Result<usize> {
     .parse::<usize>()
     .map_err(From::from)
 }
+
+#[derive(Debug,Deserialize)]
+struct Record {
+  
+}
+
+pub fn save_result(hit_rate: u64) {
+
+}

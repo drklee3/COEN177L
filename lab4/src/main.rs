@@ -2,10 +2,13 @@
 extern crate clap;   // command line argument parser
 #[macro_use]
 extern crate log;    // logging macros
+#[macro_use]
+extern crate serde_derive;
 
 extern crate chrono; // time for logging
-extern crate fern;   // logging formatter
 extern crate csv;    // csv writer for output data
+extern crate fern;   // logging formatter
+extern crate serde;
 
 use clap::{Arg, App};
 use std::io::{self, BufRead};
@@ -17,7 +20,7 @@ pub mod util;
 
 use algorithms::*;
 
-fn simulate(table_size: usize, algorithm: &str) {
+fn simulate(table_size: usize, algorithm: &str) -> f64 {
   let mut page_table = match algorithm {
     "fifo" => AlgorithmType::Fifo(Fifo::new(table_size)),
     "lru" => AlgorithmType::Lru(Lru::new(table_size)),
@@ -61,6 +64,8 @@ fn simulate(table_size: usize, algorithm: &str) {
   let hit_rate = num_hits as f64 / num_requests as f64;
   debug!("Hits: {} / {}", num_hits, num_requests);
   println!("Hit rate: {:.5}",  hit_rate);
+
+  hit_rate
 }
 
 fn main() {
@@ -125,5 +130,5 @@ fn main() {
 
   info!("Using page replacement algorithm {} for table size {}",
     algorithm.to_uppercase(), table_size);
-  simulate(table_size, algorithm);
+  let hit_rate = simulate(table_size, algorithm);
 }
