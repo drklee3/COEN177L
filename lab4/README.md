@@ -20,8 +20,8 @@ FLAGS:
     -v               Sets the level of verbosity
 
 OPTIONS:
-    -a, --algorithm <algorithm>    Sets the page replacement algorithm to use [possible values: fifo, lru,
-                                   second_chance]
+    -a, --algorithm <algorithm>    Sets the page replacement algorithm to use 
+                                   [possible values: fifo, lru, second_chance, sc]
 
 ARGS:
     <table_size>     Sets the page table size
@@ -31,9 +31,11 @@ ARGS:
 
 ```bash
 # run lru with page table size of 10
-./target/release/page-replacements 10 -a lru
+cat accesses.txt | ./target/release/page-replacements 10 -a lru
 
 # run lru show debug info (prints array / page table contents for each input)
+# probably not a good idea to run this with accesses.txt
+# for second chance: blue = referenced, red = unreferenced
 ./target/release/page-replacements 10 -a lru -v
 ```
 
