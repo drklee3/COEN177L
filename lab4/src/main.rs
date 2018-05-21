@@ -1,4 +1,4 @@
-#[macro_use] 
+#[macro_use]
 extern crate log;    // logging macros
 extern crate fern;   // logging formatter
 #[macro_use]
@@ -19,8 +19,8 @@ fn simulate(table_size: usize, algorithm: &str) {
   let mut page_table = match algorithm {
     "fifo" => AlgorithmType::Fifo(Fifo::new(table_size)),
     "lru" => AlgorithmType::Lru(Lru::new(table_size)),
-    "second_chance" => AlgorithmType::SecondChance(SecondChance::new(table_size)),
-    _ => return,
+    "second_chance" | "sc" => AlgorithmType::SecondChance(SecondChance::new(table_size)),
+    _ => unreachable!(),
   };
 
   let mut page_request;
@@ -57,7 +57,7 @@ fn simulate(table_size: usize, algorithm: &str) {
 
   let num_hits = num_requests - num_misses;
   let hit_rate = num_hits as f64 / num_requests as f64;
-  info!("Hit rate: {:.3}",  hit_rate);
+  println!("Hit rate: {:.3}",  hit_rate);
 }
 
 fn main() {
@@ -95,7 +95,7 @@ fn main() {
       .help("Sets the page replacement algorithm to use")
       .required(true)
       .takes_value(true)
-      .possible_values(&["fifo", "lru", "second_chance"])
+      .possible_values(&["fifo", "lru", "second_chance", "sc"])
     )
     .get_matches();
   
