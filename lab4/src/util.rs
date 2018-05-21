@@ -1,4 +1,10 @@
 use chrono;
+use csv::{
+  ByteRecord,
+  Position,
+  Reader,
+  Writer,
+};
 use error::{Error, Result};
 use fern::{
   self,
@@ -57,11 +63,40 @@ pub fn parse_args() -> Result<usize> {
     .map_err(From::from)
 }
 
-#[derive(Debug,Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 struct Record {
-  
+  size: usize,
+  fifo: f64,
+  lru: f64,
+  #[serde(rename = "Second Chance")]
+  second_chance: f64,
 }
 
-pub fn save_result(hit_rate: u64) {
+pub fn save_result(output: &str, algorithm: &str, table_size: usize, hit_rate: f64)
+  -> Result<()> {
+  // format output with algorithm name
+  let output = format!("{}.{}.csv", output.replace(".csv", ""), algorithm);
 
+  /*
+  // create new reader
+  let mut rdr = Reader::from_path(&output)?;
+  let pos = Position::new()
+    .set_record(table_size as u64);
+  
+  rdr.seek(pos)?;
+  let mut iter = rdr.deserialize();
+  if let Some(result) = iter.next() {
+    let record: Record = result?;
+    debug!("Found existing csv entry: {:?}", record);
+  }
+  */
+
+  // create new writer
+  let mut wtr = Writer::from_path(&output)?;
+  info!("Saving hit rate data to {}", output);
+
+  wtr.write_record(&[table_size.to_string(), hit_rate.to_string()])?;
+
+  Ok(())
 }

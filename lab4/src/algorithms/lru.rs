@@ -67,7 +67,7 @@ impl Lru {
     Lru {
       table: vec![LruPage::new(); size],
       size: size,
-      index: 0,
+      time: 0,
     }
   }
 

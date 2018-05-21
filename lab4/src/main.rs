@@ -131,4 +131,8 @@ fn main() {
   info!("Using page replacement algorithm {} for table size {}",
     algorithm.to_uppercase(), table_size);
   let hit_rate = simulate(table_size, algorithm);
+
+  if let Some(output_file) = args.value_of("output") {
+    util::save_result(output_file, algorithm, table_size, hit_rate);
+  }
 }

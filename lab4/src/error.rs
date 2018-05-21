@@ -1,3 +1,4 @@
+use csv::Error as CsvError;
 use log::SetLoggerError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -21,6 +22,8 @@ pub enum Error {
   Io(IoError),
   /// A `log` crate error by `set_logger`.
   SetLogger(SetLoggerError),
+  /// A `csv` crate error
+  Csv(CsvError),
 }
 
 impl<'a> From<&'a str> for Error {
@@ -47,6 +50,12 @@ impl From<SetLoggerError> for Error {
   }
 }
 
+impl From<CsvError> for Error {
+  fn from(err: CsvError) -> Error {
+    Error::Csv(err)
+  }
+}
+
 impl Display for Error {
   fn fmt(&self, f: &mut Formatter) -> FmtResult {
     match *self {
@@ -54,6 +63,7 @@ impl Display for Error {
       Error::ParseInt(ref inner) => inner.fmt(f),
       Error::Io(ref inner) => inner.fmt(f),
       Error::SetLogger(ref inner) => inner.fmt(f),
+      Error::Csv(ref inner) => inner.fmt(f),
     }
   }
 }
@@ -65,6 +75,7 @@ impl StdError for Error {
       Error::ParseInt(ref inner) => inner.description(),
       Error::Io(ref inner) => inner.description(),
       Error::SetLogger(ref inner) => inner.description(),
+      Error::Csv(ref inner) => inner.description(),
     }
   }
 }
