@@ -2,70 +2,93 @@
 extern crate clap;   // command line argument parser
 #[macro_use]
 extern crate log;    // logging macros
-#[macro_use]
-extern crate serde_derive;
 
 extern crate chrono; // time for logging
 extern crate csv;    // csv writer for output data
 extern crate fern;   // logging formatter
-extern crate serde;
-
-use clap::{Arg, App};
-use std::io::{self, BufRead};
-use std::process;
 
 pub mod algorithms;
 pub mod error;
 pub mod util;
 
-use algorithms::*;
+use clap::{Arg, App};
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
+use std::process;
 
-fn simulate(table_size: usize, algorithm: &str) -> f64 {
-  let mut page_table = match algorithm {
-    "fifo" => AlgorithmType::Fifo(Fifo::new(table_size)),
-    "lru" => AlgorithmType::Lru(Lru::new(table_size)),
-    "second_chance" | "sc" => AlgorithmType::SecondChance(SecondChance::new(table_size)),
-    _ => unreachable!(),
+use algorithms::*;
+use error::Result;
+
+fn simulate(input: Option<&str>, table_size: usize,
+  table_size_to: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
+
+  // has to be here to prevent lock from going out of scope
+  let stdin = io::stdin();
+
+  // choose either a file or use stdin
+  let reader = if let Some(ref file) = input {
+    let file = File::open(file)?;
+    // different reader types so return common BufRead object by allocating it on heap with Box<T>
+    Box::new(BufReader::new(file)) as Box<BufRead>
+  } else {
+    Box::new(stdin.lock()) as Box<BufRead>
   };
 
-  let mut page_request;
-  let mut num_requests = 0;
-  let mut num_misses = 0;
-
-  let stdin = io::stdin();
-  for line in stdin.lock().lines() {
-    let line = line.expect("Failed to read line from stdin");
+  let mut page_requests = Vec::new();
+  
+  // read input from stdin or file to a vec first to allow for
+  // repeat use for different memory sizes
+  for line in reader.lines() {
+    let line = line?;
     if let Ok(num) = line.parse::<u64>() {
       // only use positive numbers
       if num <= 0 {
         continue;
       }
-      page_request = num;
-    } else {
-      continue;
-    }
-
-    num_requests += 1;
-
-    // run corresponding page replacement algorithms
-    let res = match page_table {
-      AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
-      AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
-      AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
-    };
-    
-    // check if resulted in page fault
-    if res {
-      num_misses += 1;
+      page_requests.push(num);
     }
   }
 
-  let num_hits = num_requests - num_misses;
-  let hit_rate = num_hits as f64 / num_requests as f64;
-  debug!("Hits: {} / {}", num_hits, num_requests);
-  println!("Hit rate: {:.5}",  hit_rate);
+  let mut hit_rates = Vec::new();
 
-  hit_rate
+  for i in table_size..=table_size_to.unwrap_or(table_size) {
+    info!("Running simulation with table size {}", i);
+    let mut page_table = match algorithm {
+      "fifo" => AlgorithmType::Fifo(Fifo::new(i)),
+      "lru" => AlgorithmType::Lru(Lru::new(i)),
+      "second_chance" | "sc" => AlgorithmType::SecondChance(SecondChance::new(i)),
+      _ => unreachable!(),
+    };
+
+    let mut num_requests = 0;
+    let mut num_misses = 0;
+
+    // iterate over input lines
+    for &page_request in page_requests.iter() {
+      num_requests += 1;
+
+      // run corresponding page replacement algorithms
+      let res = match page_table {
+        AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
+        AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
+        AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
+      };
+      
+      // check if resulted in page fault
+      if res {
+        num_misses += 1;
+      }
+    }
+
+    let num_hits = num_requests - num_misses;
+    let hit_rate = num_hits as f64 / num_requests as f64;
+    debug!("Hits: {} / {}", num_hits, num_requests);
+    println!("Hit rate: {:.5}",  hit_rate);
+
+    hit_rates.push((i, hit_rate));
+  }
+
+  Ok(hit_rates)
 }
 
 fn main() {
@@ -78,19 +101,7 @@ fn main() {
       .help("Sets the page table size")
       .required(true)
       .index(1)
-      .validator(|size| {
-        if let Ok(parsed) = size.parse::<usize>() {
-          if parsed <= 0 {
-            // don't think we can get negative numbers so this is
-            // mainly just a check for 0
-            return Err("Please give a number over 0".into());
-          }
-        } else {
-          return Err("Please give a number".into());
-        }
-
-        Ok(())
-      })
+      .validator(util::validate_table_size)
     )
     .arg(Arg::with_name("verbose")
       .short("v")
@@ -104,6 +115,19 @@ fn main() {
       .required(true)
       .takes_value(true)
       .possible_values(&["fifo", "lru", "second_chance", "sc"])
+    )
+    .arg(Arg::with_name("to_size")
+      .short("t")
+      .long("to")
+      .help("Sets the max page table size to test a range of sizes")
+      .takes_value(true)
+      .validator(util::validate_table_size)
+    )
+    .arg(Arg::with_name("input")
+      .short("i")
+      .short("input")
+      .help("Input file for page file access numbers")
+      .takes_value(true)
     )
     .arg(Arg::with_name("output")
       .short("o")
@@ -125,14 +149,38 @@ fn main() {
     process::exit(1);
   }
 
+  let input = args.value_of("input");
+  let table_size_to = args
+    .value_of("to_size")
+    .and_then(|x| x.parse::<usize>().ok());
+
   // safe to unwrap, required & validated in clap
   let algorithm = args.value_of("algorithm").unwrap();
 
-  info!("Using page replacement algorithm {} for table size {}",
-    algorithm.to_uppercase(), table_size);
-  let hit_rate = simulate(table_size, algorithm);
+  if let Some(size_to) = table_size_to {
+    if size_to < table_size {
+      error!("Max table size (-t size) cannot be lower than table size");
+      process::exit(1);
+    }
+    info!("Using page replacement algorithm {} for table sizes {} -> {}",
+      algorithm.to_uppercase(), table_size, size_to);
+  } else {
+    info!("Using page replacement algorithm {} for table size {}",
+      algorithm.to_uppercase(), table_size);
+  }
+  
+
+  let hit_rates = match simulate(input, table_size, table_size_to, algorithm) {
+    Ok(rates) => rates,
+    Err(e) => {
+      error!("Failed simulation: {}", e);
+      process::exit(1);
+    }
+  };
 
   if let Some(output_file) = args.value_of("output") {
-    util::save_result(output_file, algorithm, table_size, hit_rate);
+    if let Err(e) = util::save_result(output_file, algorithm, hit_rates) {
+      error!("Failed to save results: {}", e);
+    }
   }
 }
