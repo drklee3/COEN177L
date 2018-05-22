@@ -11,7 +11,7 @@ pub mod algorithms;
 pub mod error;
 pub mod util;
 
-use clap::{Arg, App};
+use clap::{App, Arg};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::process;
@@ -20,7 +20,7 @@ use algorithms::*;
 use error::Result;
 
 fn simulate(input: Option<&str>, table_size: usize,
-  table_size_to: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
+  to_table_size: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
 
   // has to be here to prevent lock from going out of scope
   let stdin = io::stdin();
@@ -55,7 +55,7 @@ fn simulate(input: Option<&str>, table_size: usize,
 
   let mut hit_rates = Vec::new();
 
-  for i in table_size..=table_size_to.unwrap_or(table_size) {
+  for i in table_size..=to_table_size.unwrap_or(table_size) {
     info!("Running simulation with table size {}", i);
     let mut page_table = match algorithm {
       "fifo" => AlgorithmType::Fifo(Fifo::new(i)),
@@ -120,7 +120,7 @@ fn main() {
       .takes_value(true)
       .possible_values(&["fifo", "lru", "second_chance", "sc"])
     )
-    .arg(Arg::with_name("to_size")
+    .arg(Arg::with_name("to_table_size")
       .short("t")
       .long("to")
       .help("Sets the max page table size to test a range of sizes")
@@ -159,12 +159,12 @@ fn main() {
   // optional file input
   let input = args.value_of("input");
 
-  let table_size_to = args
-    .value_of("to_size")
+  let to_table_size = args
+    .value_of("to_table_size")
     .and_then(|x| x.parse::<usize>().ok());
 
   // check if testing a range of page table sizes
-  if let Some(size_to) = table_size_to {
+  if let Some(size_to) = to_table_size {
     if size_to < table_size {
       error!("Max table size (-t size) cannot be lower than table size");
       process::exit(1);
@@ -177,7 +177,7 @@ fn main() {
   }
   
   // run simulation(s)
-  let hit_rates = match simulate(input, table_size, table_size_to, algorithm) {
+  let hit_rates = match simulate(input, table_size, to_table_size, algorithm) {
     Ok(rates) => rates,
     Err(e) => {
       error!("Failed simulation: {}", e);
