@@ -26,14 +26,18 @@ fn simulate(input: Option<&str>, table_size: usize,
   let stdin = io::stdin();
 
   // choose either a file or use stdin
-  let reader = if let Some(ref file) = input {
-    let file = File::open(file)?;
-    // different reader types so return common BufRead object by allocating it on heap with Box<T>
+  let reader = if let Some(file_name) = input {
+    let file = File::open(file_name)?;
+    info!("Reading page accesses from file {}", &file_name);
+    // different reader types so return common BufRead trait object
+    //  by allocating it on heap with Box<T>
     Box::new(BufReader::new(file)) as Box<BufRead>
   } else {
+    info!("Reading page accesses from stdin");
     Box::new(stdin.lock()) as Box<BufRead>
   };
 
+  // Vec of page requests from stdin or a file
   let mut page_requests = Vec::new();
   
   // read input from stdin or file to a vec first to allow for
@@ -149,14 +153,17 @@ fn main() {
     process::exit(1);
   }
 
+  // safe to unwrap, required & validated in clap
+  let algorithm = args.value_of("algorithm").unwrap();
+
+  // optional file input
   let input = args.value_of("input");
+
   let table_size_to = args
     .value_of("to_size")
     .and_then(|x| x.parse::<usize>().ok());
 
-  // safe to unwrap, required & validated in clap
-  let algorithm = args.value_of("algorithm").unwrap();
-
+  // check if testing a range of page table sizes
   if let Some(size_to) = table_size_to {
     if size_to < table_size {
       error!("Max table size (-t size) cannot be lower than table size");
@@ -169,7 +176,7 @@ fn main() {
       algorithm.to_uppercase(), table_size);
   }
   
-
+  // run simulation(s)
   let hit_rates = match simulate(input, table_size, table_size_to, algorithm) {
     Ok(rates) => rates,
     Err(e) => {
@@ -178,6 +185,7 @@ fn main() {
     }
   };
 
+  // save hit rates to csv file
   if let Some(output_file) = args.value_of("output") {
     if let Err(e) = util::save_result(output_file, algorithm, hit_rates) {
       error!("Failed to save results: {}", e);
