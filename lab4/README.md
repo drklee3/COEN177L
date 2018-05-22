@@ -14,7 +14,7 @@ cargo build --release
 
 ```text
 USAGE:
-    page-replacements [FLAGS] <table_size> --algorithm <algorithm>
+    page-replacements [FLAGS] [OPTIONS] <table_size> --algorithm <algorithm>
 
 FLAGS:
     -h, --help       Prints help information
@@ -22,25 +22,49 @@ FLAGS:
     -v               Sets the level of verbosity
 
 OPTIONS:
-    -a, --algorithm <algorithm>    Sets the page replacement algorithm to use 
+    -a, --algorithm <algorithm>    Sets the page replacement algorithm to use
                                    [possible values: fifo, lru, second_chance, sc]
+    -i <input>                     Input file for page file access numbers
+    -o, --output <output>          Sets the output csv file to write results to
+    -t, --to <to_table_size>       Sets the max page table size to test a range of sizes
 
 ARGS:
-    <table_size>     Sets the page table size
+    <table_size>    Sets the page table size
 ```
 
 ## Examples
 
 ```bash
+# move to release build directory
+cd target/release/
+
 # run lru with page table size of 10
-cat accesses.txt | ./target/release/page-replacements 10 -a lru
+cat accesses.txt | ./page-replacements 10 -a lru
+
+# run multiple trials with a range of memory sizes (10 to 500)
+# output file will have the algorithm name inserted, output.csv -> output.fifo.csv
+./page-replacements 10 --to 500 -i accesses.txt -a fifo -o output.csv > /dev/null
 
 # run lru show debug info (prints array / page table contents for each input)
 # probably not a good idea to use -v with accesses.txt or large table sizes
 # for second chance: blue = referenced, red = unreferenced
 # multiple instances of the v flag can be used to increase log level:
 # use -vv to display additional information
-./target/release/page-replacements 10 -a lru -v
+./page-replacements 10 -a lru -v
+```
+
+The graph was created with R, you can run the R script with `Rscript`.
+This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]`.
+
+```bash
+# install required R packages
+$ R
+> install.packages("ggplot2")
+> install.packages("reshape2")
+> q() # select workspace image with y
+
+# run script
+$ Rscript visualize.R
 ```
 
 The Basics
