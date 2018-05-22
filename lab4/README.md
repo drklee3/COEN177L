@@ -45,12 +45,30 @@ cat accesses.txt | ./page-replacements 10 -a lru
 # output file will have the algorithm name inserted, output.csv -> output.fifo.csv
 ./page-replacements 10 --to 500 -i accesses.txt -a fifo -o output.csv > /dev/null
 
+# run multiple trials with a range of memory sizes (10 to 500)
+# output file will have the algorithm name inserted, output.csv -> output.fifo.csv
+./target/release/page-replacements 10 --to 500 -a fifo -o output.csv -i accesses.txt > /dev/null
+
 # run lru show debug info (prints array / page table contents for each input)
 # probably not a good idea to use -v with accesses.txt or large table sizes
 # for second chance: blue = referenced, red = unreferenced
 # multiple instances of the v flag can be used to increase log level:
 # use -vv to display additional information
 ./page-replacements 10 -a lru -v
+```
+
+The graph was created with R, you can run the R script with `Rscript`.
+This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]`.
+
+```bash
+# install required R packages
+$ R
+> install.packages("ggplot2")
+> install.packages("reshape2")
+> q() # select workspace image with y
+
+# run script
+$ Rscript visualize.R
 ```
 
 The graph was created with R, you can run the R script with `Rscript`.
