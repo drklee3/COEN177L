@@ -79,6 +79,9 @@ pub fn save_result(output: &str, algorithm: &str, hit_rates: Vec<(usize, f64)>)
 
   // create new writer
   let mut wtr = Writer::from_path(&output)?;
+  // write header
+  wtr.write_record(&["table_size", algorithm])?;
+  // write each hit rate
   for record in hit_rates {
     wtr.write_record(&[record.0.to_string(), record.1.to_string()])?;
   }
