@@ -4,6 +4,7 @@
 
 ```bash
 # install rust (https://www.rust-lang.org/en-US/install.html)
+# requires at least v1.26
 curl https://sh.rustup.rs -sSf | sh
 # compile optimized build
 cargo build --release

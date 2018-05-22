@@ -7,7 +7,6 @@ use std::io::Error as IoError;
 use std::num::ParseIntError;
 
 /// Common result type used throughout the program.
-/// There aren't really many possible errors though.
 pub type Result<T> = StdResult<T, Error>;
 
 /// Common error type used throughout the program, to be used as a holder for
