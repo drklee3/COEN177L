@@ -18,6 +18,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
+    -s               Enable stdout logging for each page fault
     -V, --version    Prints version information
     -v               Sets the level of verbosity
 
@@ -43,18 +44,20 @@ cat accesses.txt | ./page-replacements 10 -a lru
 
 # run multiple trials with a range of memory sizes (10 to 500)
 # output file will have the algorithm name inserted, output.csv -> output.fifo.csv
-./page-replacements 10 --to 500 -i accesses.txt -a fifo -o output.csv > /dev/null
+# the output file is truncated if it already exists
+./page-replacements 10 --to 500 -i accesses.txt -a fifo -o output.csv
 
 # run lru show debug info (prints array / page table contents for each input)
-# probably not a good idea to use -v with accesses.txt or large table sizes
+# probably not a good idea to use -v or -s with accesses.txt or large table sizes
+# printing to stdout is a big bottleneck
 # for second chance: blue = referenced, red = unreferenced
 # multiple instances of the v flag can be used to increase log level:
 # use -vv to display additional information
-./page-replacements 10 -a lru -v
+./page-replacements 10 -a lru -vs
 ```
 
 The graph was created with R, you can run the R script with `Rscript`.
-This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
+This requires a CSV file for each page replacement algorithm in the same directory with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
 
 ```bash
 # install required R packages
