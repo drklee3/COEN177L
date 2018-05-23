@@ -69,11 +69,13 @@ impl Simulation {
     }
   }
 
-  pub fn get_hit_rate(&self, ) -> f64 {
+  pub fn get_hit_rate(&self, should_stdout: bool) -> f64 {
     let num_hits = self.num_requests - self.num_misses;
     let hit_rate = num_hits as f64 / self.num_requests as f64;
     debug!("Hits: {} / {}", num_hits, self.num_requests);
-    println!("Hit rate: {:.5}",  hit_rate);
+    if should_stdout {
+      println!("Hit rate: {:.5}",  hit_rate);
+    }
 
     hit_rate
   }
