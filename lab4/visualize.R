@@ -4,7 +4,7 @@ theme_set(theme_minimal())
 getwd()
 
 multiMerge = function() {
-  filenames = list.files(path = "./data/", pattern="*.csv", full.names = TRUE)
+  filenames = list.files(path = "./data/", pattern="output.*.csv", full.names = TRUE)
   datalist = lapply(filenames, function(x) {
     read.csv(file = x, header = TRUE, stringsAsFactors = FALSE)
   })
@@ -15,7 +15,7 @@ multiMerge = function() {
 
 data <- multiMerge()
 head(data)
-write.csv(data, "algorithm_data.csv", row.names=FALSE)
+write.csv(data, "./data/algorithm_data.csv", row.names=FALSE)
 
 chart_data <- melt(data, id="table_size")
 head(chart_data)
