@@ -48,7 +48,7 @@ impl Simulation {
       })
   }
 
-  pub fn page_request(&mut self, page_request: &str) {
+  pub fn page_request(&mut self, page_request: &str, should_stdout: bool) {
     let page_request = match self.parse_line(page_request) {
       Some(req) => req,
       None => return,
@@ -58,9 +58,9 @@ impl Simulation {
 
     // run corresponding page replacement algorithms
     let res = match self.algorithm {
-      AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
-      AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
-      AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
+      AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request, should_stdout),
+      AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request, should_stdout),
+      AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request, should_stdout),
     };
     
     // check if resulted in page fault

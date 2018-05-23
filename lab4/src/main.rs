@@ -11,6 +11,7 @@ extern crate threadpool;
 
 pub mod algorithms;
 pub mod error;
+pub mod model;
 pub mod simulate;
 pub mod util;
 
@@ -18,6 +19,7 @@ use clap::{App, Arg};
 use std::process;
 
 use simulate::*;
+use model::simulation::*;
 
 fn main() {
   // parse args
@@ -35,6 +37,10 @@ fn main() {
       .short("v")
       .multiple(true)
       .help("Sets the level of verbosity")
+    )
+    .arg(Arg::with_name("stdout")
+      .short("s")
+      .help("Enable stdout logging for each page fault")
     )
     .arg(Arg::with_name("algorithm")
       .short("a")
@@ -77,6 +83,8 @@ fn main() {
     process::exit(1);
   }
 
+  let should_stdout = args.is_present("stdout");
+
   // safe to unwrap, required & validated in clap
   let algorithm = args.value_of("algorithm").unwrap();
 
@@ -99,9 +107,17 @@ fn main() {
     info!("Using page replacement algorithm {} for table size {}",
       algorithm.to_uppercase(), table_size);
   }
+
+  let options = SimulationOptions {
+    input,
+    table_size,
+    to_table_size,
+    algorithm,
+    should_stdout,
+  };
   
   // run simulation(s)
-  let hit_rates = match simulate(input, table_size, to_table_size, algorithm) {
+  let hit_rates = match simulate(options) {
     Ok(rates) => rates,
     Err(e) => {
       error!("Failed simulation: {}", e);

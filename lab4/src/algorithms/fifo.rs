@@ -19,9 +19,11 @@ impl Fifo {
   }
 
   /// Handles a page request, returns true if page fault occurred
-  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
+  pub fn handle_page_request(&mut self, page_request: u64, should_stdout: bool) -> bool {
     if !self.table.contains(&page_request) {
-      println!("Page {} caused a page fault", page_request);
+      if should_stdout {
+        println!("Page {} caused a page fault", page_request);
+      }
 
       // safe to unwrap, self.index should never go >= len 
       {

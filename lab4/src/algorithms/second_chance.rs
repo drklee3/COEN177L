@@ -51,7 +51,7 @@ impl SecondChance {
   }
 
   /// Handles a page request, returns true if page fault occurred
-  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
+  pub fn handle_page_request(&mut self, page_request: u64, should_stdout: bool) -> bool {
     // get page index, returns None if doesn't exist in table
     let page_index = self.table
       .iter()
@@ -59,7 +59,10 @@ impl SecondChance {
     
     // doesn't contain page number, not in memory
     if page_index.is_none() {
-      // println!("Page {} caused a page fault", page_request);
+      // big bottleneck!!
+      if should_stdout {
+        println!("Page {} caused a page fault", page_request);
+      }
 
       loop {
         // safe to unwrap, vec is initialized to be full and self.index is circular

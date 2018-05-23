@@ -5,11 +5,18 @@ use std::io::{self, BufRead, BufReader};
 use std::sync::Arc;
 use parking_lot::{Mutex, RwLock};
 use threadpool::Builder;
+use model::simulation::*;
 
 /// Runs a simulation or simulations for a range of table sizes,
 /// buffers input via a file given to allow for page request input reuse
-pub fn simulate_file(file_name: &str, table_size: usize,
-  to_table_size: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
+pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
+
+  let file_name = options.input.unwrap(); // checked before
+  let table_size = options.table_size;
+  let to_table_size = options.to_table_size;
+  let algorithm = options.algorithm;
+  let should_stdout = options.should_stdout;
+
   let file = File::open(file_name)?;
   info!("Reading page accesses from file {}", &file_name);
   let reader = BufReader::new(file);
@@ -50,7 +57,7 @@ pub fn simulate_file(file_name: &str, table_size: usize,
       // iterate over file lines
       let reader = page_requests.read();
       for page_request in reader.iter() {
-        sim.page_request(page_request);
+        sim.page_request(page_request, should_stdout);
       }
 
       {
@@ -69,14 +76,14 @@ pub fn simulate_file(file_name: &str, table_size: usize,
 
 /// Runs a single simulation without input buffering to allow for immediate
 /// feedback per page request, main use case for testing
-pub fn simulate_stdin(table_size: usize, algorithm: &str) -> Result<f64> {
+pub fn simulate_stdin(table_size: usize, algorithm: &str, should_stdout: bool) -> Result<f64> {
   let mut sim = Simulation::new(table_size, algorithm);
   let stdin = io::stdin();
 
   // iterate over input lines
   for line in stdin.lock().lines() {
     let page_request = line?;
-    sim.page_request(&page_request);
+    sim.page_request(&page_request, should_stdout);
   }
 
   Ok(sim.get_hit_rate())
@@ -84,19 +91,18 @@ pub fn simulate_stdin(table_size: usize, algorithm: &str) -> Result<f64> {
 
 /// Checks if there is an input file and runs simulations,
 /// uses stdin input if no input file found
-pub fn simulate(input: Option<&str>, table_size: usize,
-  to_table_size: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
-  
-  if let Some(file_name) = input {
-    let hit_rates = simulate_file(file_name, table_size, to_table_size, algorithm);
+pub fn simulate(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
+  if options.input.is_some() {
+    let hit_rates = simulate_file(options);
 
     return hit_rates;
   }
 
   // no input file, read from stdin
   let mut hit_rates = Vec::new();
-  let hit_rate = simulate_stdin(table_size, algorithm);
-  hit_rates.push((table_size, hit_rate.unwrap()));
+  let hit_rate = simulate_stdin(options.table_size,
+    options.algorithm, options.should_stdout);
+  hit_rates.push((options.table_size, hit_rate.unwrap()));
 
   Ok(hit_rates)
 }

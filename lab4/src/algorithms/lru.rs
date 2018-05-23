@@ -72,7 +72,7 @@ impl Lru {
   }
 
   /// Handles a page request, returns true if page fault occurred
-  pub fn handle_page_request(&mut self, page_request: u64) -> bool {
+  pub fn handle_page_request(&mut self, page_request: u64, should_stdout: bool) -> bool {
     // get min and max times and indexes
     let min_max_page = self.table
       .iter()
@@ -99,7 +99,9 @@ impl Lru {
 
     // check if in memory / page table
     if page_index.is_none() {
-      println!("Page {} caused a page fault", page_request);
+      if should_stdout {
+        println!("Page {} caused a page fault", page_request);
+      }
 
       // create a new page entry
       let new_page = LruPage {
