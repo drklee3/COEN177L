@@ -9,91 +9,14 @@ extern crate fern;   // logging formatter
 
 pub mod algorithms;
 pub mod error;
+pub mod simulate;
 pub mod util;
 
 use clap::{App, Arg};
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
 use std::process;
 
-use algorithms::*;
-use error::Result;
+use simulate::*;
 
-fn simulate(input: Option<&str>, table_size: usize,
-  to_table_size: Option<usize>, algorithm: &str) -> Result<Vec<(usize, f64)>> {
-
-  // has to be here to prevent lock from going out of scope
-  let stdin = io::stdin();
-
-  // choose either a file or use stdin
-  let reader = if let Some(file_name) = input {
-    let file = File::open(file_name)?;
-    info!("Reading page accesses from file {}", &file_name);
-    // different reader types so return common BufRead trait object
-    //  by allocating it on heap with Box<T>
-    Box::new(BufReader::new(file)) as Box<BufRead>
-  } else {
-    info!("Reading page accesses from stdin");
-    Box::new(stdin.lock()) as Box<BufRead>
-  };
-
-  // Vec of page requests from stdin or a file
-  let mut page_requests = Vec::new();
-  
-  // read input from stdin or file to a vec first to allow for
-  // repeat use for different memory sizes
-  for line in reader.lines() {
-    let line = line?;
-    if let Ok(num) = line.parse::<u64>() {
-      // only use positive numbers
-      if num <= 0 {
-        continue;
-      }
-      page_requests.push(num);
-    }
-  }
-
-  let mut hit_rates = Vec::new();
-
-  for i in table_size..=to_table_size.unwrap_or(table_size) {
-    info!("Running simulation with table size {}", i);
-    let mut page_table = match algorithm {
-      "fifo" => AlgorithmType::Fifo(Fifo::new(i)),
-      "lru" => AlgorithmType::Lru(Lru::new(i)),
-      "second_chance" | "sc" => AlgorithmType::SecondChance(SecondChance::new(i)),
-      _ => unreachable!(),
-    };
-
-    let mut num_requests = 0;
-    let mut num_misses = 0;
-
-    // iterate over input lines
-    for &page_request in page_requests.iter() {
-      num_requests += 1;
-
-      // run corresponding page replacement algorithms
-      let res = match page_table {
-        AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request),
-        AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request),
-        AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request),
-      };
-      
-      // check if resulted in page fault
-      if res {
-        num_misses += 1;
-      }
-    }
-
-    let num_hits = num_requests - num_misses;
-    let hit_rate = num_hits as f64 / num_requests as f64;
-    debug!("Hits: {} / {}", num_hits, num_requests);
-    println!("Hit rate: {:.5}",  hit_rate);
-
-    hit_rates.push((i, hit_rate));
-  }
-
-  Ok(hit_rates)
-}
 
 fn main() {
   // parse args

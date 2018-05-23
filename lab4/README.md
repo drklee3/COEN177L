@@ -54,21 +54,7 @@ cat accesses.txt | ./page-replacements 10 -a lru
 ```
 
 The graph was created with R, you can run the R script with `Rscript`.
-This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]`.
-
-```bash
-# install required R packages
-$ R
-> install.packages("ggplot2")
-> install.packages("reshape2")
-> q() # select workspace image with y
-
-# run script
-$ Rscript visualize.R
-```
-
-The graph was created with R, you can run the R script with `Rscript`.
-This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]`.
+This requires a CSV file for each page replacement algorithm with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
 
 ```bash
 # install required R packages
