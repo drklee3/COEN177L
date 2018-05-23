@@ -85,7 +85,7 @@ Hit Rate Overview
 
 From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in `data/algorithm_data.csv` and shown below visually in the plot.
 
-![Page Replacement Algorithms Plot][plot.png]
+![Page Replacement Algorithms Plot](plot.png)
 
 
 
