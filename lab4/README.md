@@ -6,8 +6,12 @@
 # install rust (https://www.rust-lang.org/en-US/install.html)
 # requires at least v1.26
 curl https://sh.rustup.rs -sSf | sh
+
 # compile optimized build
 cargo build --release
+
+# move to release build directory
+cd target/release/
 ```
 
 ## Usage
@@ -18,7 +22,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -s               Enable stdout logging for each page fault
+    -s               Enables stdout logging for each page fault
     -V, --version    Prints version information
     -v               Sets the level of verbosity
 
@@ -36,11 +40,8 @@ ARGS:
 ## Examples
 
 ```bash
-# move to release build directory
-cd target/release/
-
-# run lru with page table size of 10
-cat accesses.txt | ./page-replacements 10 -a lru
+# run lru with page table size of 10 & print page faults
+cat accesses.txt | ./page-replacements 10 -a lru -s > output.txt
 
 # run multiple trials with a range of memory sizes (10 to 500)
 # output file will have the algorithm name inserted, output.csv -> output.fifo.csv
@@ -56,8 +57,8 @@ cat accesses.txt | ./page-replacements 10 -a lru
 ./page-replacements 10 -a lru -vs
 ```
 
-The graph was created with R, you can run the R script with `Rscript`.
-This requires a CSV file for each page replacement algorithm in the same directory with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
+The graph was created with R, you can run it with `Rscript`.
+This requires a CSV file for each page replacement algorithm in the data directory following the file name `output.*.csv` with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
 
 ```bash
 # install required R packages
@@ -69,6 +70,24 @@ $ R
 # run script
 $ Rscript visualize.R
 ```
+
+## Results
+
+Hit Rate Overview
+
+| Table Size | FIFO    | LRU     | Second Chance |
+| ---------- | ------- | ------- | ------------- |
+| 10         | 0.30695 | 0.31015 | 0.31272       |
+| 50         | 0.48611 | 0.51362 | 0.51742       |
+| 100        | 0.57079 | 0.59756 | 0.59930       |
+| 200        | 0.66477 | 0.68420 | 0.68450       |
+| 500        | 0.90212 | 0.90128 | 0.90198       |
+
+From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in `data/algorithm_data.csv` and shown below visually in the plot.
+
+![Page Replacement Algorithms Plot][plot.png]
+
+
 
 The Basics
 The goal of this assignment is to gain experience with page replacement (and to a lesser extent, caching) algorithms. In this assignment your goal is to write programs that simulate page replacement algorithms. Your initial program is to accept at least one numeric command-line parameter, which it will use as the number of available page frames. 
