@@ -11,11 +11,15 @@ use model::simulation::*;
 /// buffers input via a file given to allow for page request input reuse
 pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
 
-  let file_name = options.input.unwrap(); // checked before
-  let table_size = options.table_size;
-  let to_table_size = options.to_table_size;
-  let algorithm = options.algorithm;
-  let should_stdout = options.should_stdout;
+  // destructure options struct
+  let SimulationOptions {
+    input,
+    table_size,
+    to_table_size,
+    algorithm,
+    should_stdout,
+  } = options;
+  let file_name = input.unwrap(); // checked before so ok to unwrap
 
   let file = File::open(file_name)?;
   info!("Reading page accesses from file {}", &file_name);
@@ -31,6 +35,9 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
     page_requests.push(line);
   }
 
+  // vec of page requests, same content as the input file
+  // not really necessary to use a rwlock since we are not
+  // modifying the vec after reading the file above
   let page_requests = Arc::new(RwLock::new(page_requests));
 
   // thread safe hit rates
