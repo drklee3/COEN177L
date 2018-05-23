@@ -33,7 +33,7 @@ pub fn setup_logger(verbosity: u64) -> Result<()> {
     .format(move |out, message, record| {
       out.finish(format_args!(
         "{}[{}] {}",
-        chrono::Local::now().format("[%y%m%d %H:%M:%S]"),
+        chrono::Local::now().format("[%H:%M:%S]"),
         colors.color(record.level()),
         message
       ))
@@ -72,8 +72,11 @@ pub fn validate_table_size(size: String) -> std::result::Result<(), String> {
   Ok(())
 }
 
-pub fn save_result(output: &str, algorithm: &str, hit_rates: Vec<(usize, f64)>)
+pub fn save_result(output: &str, algorithm: &str, mut hit_rates: Vec<(usize, f64)>)
   -> Result<()> {
+  // sort vec, likely out of order due to multithreading
+  hit_rates.sort_by(|a, b| a.0.cmp(&b.0));
+
   // format output with algorithm name
   let output = format!("{}.{}.csv", output.replace(".csv", ""), algorithm);
 

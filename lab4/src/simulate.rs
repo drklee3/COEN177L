@@ -6,6 +6,7 @@ use std::sync::Arc;
 use parking_lot::{Mutex, RwLock};
 use threadpool::Builder;
 use model::simulation::*;
+use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 
 /// Runs a simulation or simulations for a range of table sizes,
 /// buffers input via a file given to allow for page request input reuse
@@ -19,7 +20,10 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
     algorithm,
     should_stdout,
   } = options;
+
   let file_name = input.unwrap(); // checked before so ok to unwrap
+  // use to table size or just use same as table_size
+  let to_table_size = to_table_size.unwrap_or(table_size);
 
   let file = File::open(file_name)?;
   info!("Reading page accesses from file {}", &file_name);
@@ -51,15 +55,33 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
   
   info!("Using {} threads for concurrent simulations", pool.max_count());
 
+  let num_simulations = if to_table_size != table_size {
+    (to_table_size - table_size) as u64
+  } else {
+    1
+  };
+
+  let progress_bar = ProgressBar::new(num_simulations);
+  let sty = ProgressStyle::default_bar()
+    .template("[{elapsed_precise}] ETA {eta} {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+    .progress_chars("##-");
+
+  progress_bar.set_draw_target(ProgressDrawTarget::stderr());
+  progress_bar.set_style(sty);
+
+  let bar = Arc::new(progress_bar);
+
   // repeat for table size range
-  for curr_table_size in table_size..=to_table_size.unwrap_or(table_size) {
+  for curr_table_size in table_size..=to_table_size {
     // clone hit_rate vec pointer
     let page_requests = page_requests.clone();
     let hit_rates = hit_rates.clone();
     let algorithm = algorithm.to_string();
+    let bar = bar.clone();
     // run on threadpool
     pool.execute(move || {
-      info!("Running simulation with table size {}", curr_table_size);
+      // info!("Running simulation with table size {}", curr_table_size);
+      bar.set_message(&format!("Simulating table size {}", curr_table_size));
       let mut sim = Simulation::new(curr_table_size, &algorithm);
       // iterate over file lines
       let reader = page_requests.read();
@@ -70,13 +92,15 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
       {
         // push hit rate to vec
         let mut guard = hit_rates.lock();
-        guard.push((curr_table_size, sim.get_hit_rate()));
+        guard.push((curr_table_size, sim.get_hit_rate(should_stdout)));
       }
+      bar.inc(1);
     })
   }
 
   // wait until jobs finished
   pool.join();
+  bar.finish_with_message(&format!("Finished {} simulations", num_simulations));
 
   Ok(Arc::try_unwrap(hit_rates).unwrap().into_inner().clone())
 }
@@ -93,7 +117,7 @@ pub fn simulate_stdin(table_size: usize, algorithm: &str, should_stdout: bool) -
     sim.page_request(&page_request, should_stdout);
   }
 
-  Ok(sim.get_hit_rate())
+  Ok(sim.get_hit_rate(should_stdout))
 }
 
 /// Checks if there is an input file and runs simulations,

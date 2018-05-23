@@ -8,6 +8,7 @@ extern crate csv;    // csv writer for output data
 extern crate fern;   // logging formatter
 extern crate parking_lot;
 extern crate threadpool;
+extern crate indicatif;
 
 pub mod algorithms;
 pub mod error;
