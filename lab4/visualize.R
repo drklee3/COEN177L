@@ -1,6 +1,6 @@
 library(ggplot2)
 library(reshape2)
-theme_set(theme_bw())
+theme_set(theme_minimal())
 getwd()
 
 multiMerge = function() {
@@ -24,11 +24,12 @@ names(chart_data) <- c("size", "Algorithm", "value")
 ggplot() +
   geom_line(data = chart_data,
     aes(x = size, y = value, color = Algorithm),
-    size = 1) +
+    size = .5,
+    alpha=0.80) +
   labs(title="Hit Rate of Page Replacement Algorithms", 
-    y = "Hit Rate %", 
+    y = "Hit Rate", 
     x = "Table size",
     color = NULL)
 
-ggsave("plot.png", device = png())
+ggsave("plot.png", device = png(), width = 8, height = 6)
 dev.off()
