@@ -1,7 +1,10 @@
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
 use algorithms::*;
 use error::Result;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
+use std::sync::Arc;
+use parking_lot::{Mutex, RwLock};
+use threadpool::Builder;
 
 /// Runs a simulation or simulations for a range of table sizes,
 /// buffers input via a file given to allow for page request input reuse
@@ -21,27 +24,52 @@ pub fn simulate_file(file_name: &str, table_size: usize,
     page_requests.push(line);
   }
 
-  let mut hit_rates = Vec::new();
+  let page_requests = Arc::new(RwLock::new(page_requests));
+
+  // thread safe hit rates
+  // mutex in atomically referenced counted pointer
+  let hit_rates = Arc::new(Mutex::new(Vec::new()));
+
+  // build threadpool, # threads = cpu count
+  let pool = Builder::new()
+    .thread_name("simulation_worker".into())
+    .build();
+  
+  info!("Using {} threads for concurrent simulations", pool.max_count());
 
   // repeat for table size range
   for curr_table_size in table_size..=to_table_size.unwrap_or(table_size) {
-    let mut sim = Simulation::new(curr_table_size, algorithm);
-    // iterate over file lines
-    for page_request in &page_requests {
-      sim.page_request(page_request);
-    }
+    // clone hit_rate vec pointer
+    let page_requests = page_requests.clone();
+    let hit_rates = hit_rates.clone();
+    let algorithm = algorithm.to_string();
+    // run on threadpool
+    pool.execute(move || {
+      info!("Running simulation with table size {}", curr_table_size);
+      let mut sim = Simulation::new(curr_table_size, &algorithm);
+      // iterate over file lines
+      let reader = page_requests.read();
+      for page_request in reader.iter() {
+        sim.page_request(page_request);
+      }
 
-    // push hit rate to vec
-    hit_rates.push((curr_table_size, sim.get_hit_rate()));
+      {
+        // push hit rate to vec
+        let mut guard = hit_rates.lock();
+        guard.push((curr_table_size, sim.get_hit_rate()));
+      }
+    })
   }
 
-  Ok(hit_rates)
+  // wait until jobs finished
+  pool.join();
+
+  Ok(Arc::try_unwrap(hit_rates).unwrap().into_inner().clone())
 }
 
 /// Runs a single simulation without input buffering to allow for immediate
 /// feedback per page request, main use case for testing
 pub fn simulate_stdin(table_size: usize, algorithm: &str) -> Result<f64> {
-  info!("Running simulation with table size {}", table_size);
   let mut sim = Simulation::new(table_size, algorithm);
   let stdin = io::stdin();
 

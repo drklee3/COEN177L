@@ -6,6 +6,8 @@ extern crate log;    // logging macros
 extern crate chrono; // time for logging
 extern crate csv;    // csv writer for output data
 extern crate fern;   // logging formatter
+extern crate parking_lot;
+extern crate threadpool;
 
 pub mod algorithms;
 pub mod error;
@@ -16,7 +18,6 @@ use clap::{App, Arg};
 use std::process;
 
 use simulate::*;
-
 
 fn main() {
   // parse args

@@ -59,10 +59,10 @@ impl SecondChance {
     
     // doesn't contain page number, not in memory
     if page_index.is_none() {
-      println!("Page {} caused a page fault", page_request);
+      // println!("Page {} caused a page fault", page_request);
 
       loop {
-        // safe to unwrap, vec is initialized to be full
+        // safe to unwrap, vec is initialized to be full and self.index is circular
         let page = self.table
           .get_mut(self.index)
           .unwrap();
