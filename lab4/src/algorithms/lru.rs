@@ -90,9 +90,15 @@ impl Lru {
 
         acc
       });
+    
+    // do this before check so don't need 2 searches to find this
+    // entry again if it does exist
+    let page_index = self.table
+      .iter()
+      .position(|x| x.number == page_request);
 
-    // search if in memory / page table
-    if !self.table.iter().any(|x| x.number == page_request) {
+    // check if in memory / page table
+    if page_index.is_none() {
       println!("Page {} caused a page fault", page_request);
 
       // create a new page entry
@@ -114,20 +120,16 @@ impl Lru {
       return true;
     }
 
-    let index = self.table
-      .iter()
-      .position(|x| x.number == page_request)
-      .unwrap(); // can unwrap here since vec must contain the item here
-
+    // update time for existing page
     {
+      // can unwrap here since vec must contain the item here
+      let index = page_index.unwrap();
       let elem = self.table.get_mut(index).unwrap();
       trace!("ADJUST: #{} time [{} -> {}] @ i = {}",
         elem.number, elem.time, min_max_page.max + 1, index);
       elem.time = min_max_page.max + 1;
     }
     
-    // don't have to do anything if already in memory
-
     debug!("{:?}", self.table);
     false
   }
