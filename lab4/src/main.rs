@@ -10,7 +10,6 @@ extern crate parking_lot;
 extern crate threadpool;
 extern crate indicatif;
 
-pub mod algorithms;
 pub mod error;
 pub mod model;
 pub mod simulate;
