@@ -37,6 +37,8 @@ ARGS:
     <table_size>    Sets the page table size
 ```
 
+Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the number of threads the number of CPU cores for concurrent simulations. Individual simulations are single threaded.
+
 ## Examples
 
 ```bash
