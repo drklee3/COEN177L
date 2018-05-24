@@ -29,7 +29,7 @@ FLAGS:
 OPTIONS:
     -a, --algorithm <algorithm>    Sets the page replacement algorithm to use
                                    [possible values: fifo, lru, second_chance, sc]
-    -i <input>                     Input file for page file access numbers
+    -i, --input <input>            Input file for page file access numbers
     -o, --output <output>          Sets the output csv file to write results to
     -t, --to <to_table_size>       Sets the max page table size to test a range of sizes
 
@@ -71,6 +71,55 @@ $ R
 $ Rscript visualize.R
 ```
 
+## Implementations
+
+This program supports three different page replacement algorithms, first in first out (FIFO), least recently used (LRU), and second chance page replacement (SC). These were all implemented differently in ways to prevent unnecessary shifting in the page table.
+
+### First In First Out (FIFO)
+
+First in first out was the most simple to implement. Page requests were added to the table then removed in the order they were inserted. The following are the two cases when a page request is made:
+
+1. The page does not exist in memory:
+
+   The page is added to the "front" of the list. If memory is full, the first page inserted is removed.
+
+2. The page exists in memory:
+
+   No changes are made to memory.
+
+This was implemented in with a circular queue, instead of having a specified "front" and "end" of memory, pages were replaced in a circular fashion with an incrementing position (`(index + 1) % table_size`) to prevent the need of shifting vector items.
+
+The more simple algorithm when inserting a new page when memory is full is to remove the first element in an array or vector, shift everything afterwards over to fill in the gap, then insert the new page at the end. This is much less efficient in that each page request that results in a replacement requires shifting n items, compared to no shifting at all for a circular queue.
+
+### Least Recently Used (LRU)
+
+LRU is similar to FIFO in that when the page does not exist in memory, the page is added to the "front" of the list. However there were differences in which page to throw out and pages accessed that were already in memory. LRU consisted of the following two cases:
+
+1. The page does not exist in memory:
+
+   The page is added to the "front" of the list. If memory is full, the oldest page is removed.
+
+2. The page exists in memory:
+
+   Either the page is moved back to the "front" of the list, or the page's "time" is set to the current time.
+
+Using the method of moving pages to the front of the list when the page already exists in memory caused a decent amount of overhead similar to FIFO. While it is more simple to implement, this required removing the first element, shifting all elements over, then readding the element to the front. To reduce overhead, each page is assigned a time value. When a page is to be removed, instead of shifting elements in the vector around the item page number can be simply replaced with the new one and given the next time value. A O(n) loop would have to be done to search for the page to replace / remove, though requires than moving items in a vector.
+When a page is accessed and is in memory, the time value is simply set to the current time. The time used was simply a "global" incrementing counter for each insertion / access (global in the sense of all pages can use this value, but in terms of the program it is not a global variable).
+
+### Second Chance (SC)
+
+Second chance was an extension of FIFO conceptually, giving pages a second chance before removing them.
+
+1. The page does not exist in memory:
+
+   The page is added to the "front" of the list. If memory is full, check the referenced bit before removing: If 0, remove page.  If 1, reset referenced bit to 0 then move to front of list and repeat until an unreferenced page is removed.
+
+2. The page exists in memory:
+
+   The page's referenced "bit" is changed to 1 if previously 0. No changes if the page is already referenced.
+
+While the implementation can be done similar to previous methods with an extension of FIFO, it would also run into the same overhead of unnecessary shifts and page removals. To work around this, the clock algorithm was used instead with the same functionality of second chance with a circular vector / array. If the memory is full and a page request results in a page fault, the memory is looped until a page is found with the referenced bit set to 0 (or the reference bool set to false in this case) while resetting any pages that are referenced. The found page is then replaced with the new page request. If the page request refers to a page already in memory, the page's referenced bit / bool is simply set to 1 / true.
+
 ## Results
 
 Hit Rate Overview
@@ -83,7 +132,7 @@ Hit Rate Overview
 | 200        | 0.66477 | 0.68420 | 0.68450       |
 | 500        | 0.90212 | 0.90128 | 0.90198       |
 
-From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in `data/algorithm_data.csv` and shown below visually in the plot.
+From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in [`data/algorithm_data.csv`](data/algorithm_data.csv) and shown below visually in the plot.
 
 ![Page Replacement Algorithms Plot](plot.png)
 
