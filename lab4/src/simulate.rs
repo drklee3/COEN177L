@@ -1,15 +1,19 @@
 use error::Result;
+use indicatif::{
+  ProgressBar,
+  ProgressDrawTarget,
+  ProgressStyle,
+};
+use model::simulation::*;
+use parking_lot::{Mutex, RwLock};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::sync::Arc;
-use parking_lot::{Mutex, RwLock};
 use threadpool::Builder;
-use model::simulation::*;
-use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 
 /// Runs a simulation or simulations for a range of table sizes,
 /// buffers input via a file given to allow for page request input reuse
-pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
+fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
 
   // destructure options struct
   let SimulationOptions {
@@ -60,19 +64,21 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
     1
   };
 
+  // create a new progress bar
   let progress_bar = ProgressBar::new(num_simulations);
   let sty = ProgressStyle::default_bar()
     .template("[{elapsed_precise}] ETA {eta} {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
     .progress_chars("##-");
 
-  progress_bar.set_draw_target(ProgressDrawTarget::stderr());
   progress_bar.set_style(sty);
+  progress_bar.set_draw_target(ProgressDrawTarget::stderr());
 
+  // put bar in an arc to allow for multi thread references
   let bar = Arc::new(progress_bar);
 
   // repeat for table size range
   for curr_table_size in table_size..=to_table_size {
-    // clone hit_rate vec pointer
+    // clone arc pointers to be moved into new thread
     let page_requests = page_requests.clone();
     let hit_rates = hit_rates.clone();
     let algorithm = algorithm.to_string();
@@ -101,12 +107,15 @@ pub fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
   pool.join();
   bar.finish_with_message(&format!("Finished {} simulations", num_simulations));
 
+  // get inner value of Arc<Mutex> and clone, 
+  // probably not ideal to clone the data but hard to take ownership
+  // of T in Arc<Mutex<T>> after wrapping it
   Ok(Arc::try_unwrap(hit_rates).unwrap().into_inner().clone())
 }
 
 /// Runs a single simulation without input buffering to allow for immediate
 /// feedback per page request, main use case for testing
-pub fn simulate_stdin(table_size: usize, algorithm: &str, should_stdout: bool) -> Result<f64> {
+fn simulate_stdin(table_size: usize, algorithm: &str, should_stdout: bool) -> Result<f64> {
   let mut sim = Simulation::new(table_size, algorithm);
   let stdin = io::stdin();
 
