@@ -1,14 +1,14 @@
 #[macro_use]
-extern crate clap;   // command line argument parser
+extern crate clap;        // command line argument parser
 #[macro_use]
-extern crate log;    // logging macros
+extern crate log;         // logging macros
 
-extern crate chrono; // time for logging
-extern crate csv;    // csv writer for output data
-extern crate fern;   // logging formatter
-extern crate parking_lot;
-extern crate threadpool;
-extern crate indicatif;
+extern crate chrono;      // time for logging
+extern crate csv;         // csv writer for output data
+extern crate fern;        // logging formatter
+extern crate parking_lot; // more efficient synchronization primitives
+extern crate threadpool;  // thread pool for concurrent simulations
+extern crate indicatif;   // progress reporting
 
 pub mod error;
 pub mod model;
@@ -18,8 +18,8 @@ pub mod util;
 use clap::{App, Arg};
 use std::process;
 
-use simulate::*;
 use model::simulation::*;
+use simulate::simulate;
 
 fn main() {
   // parse args
@@ -40,7 +40,7 @@ fn main() {
     )
     .arg(Arg::with_name("stdout")
       .short("s")
-      .help("Enable stdout logging for each page fault")
+      .help("Enables stdout logging for each page fault")
     )
     .arg(Arg::with_name("algorithm")
       .short("a")
@@ -59,7 +59,7 @@ fn main() {
     )
     .arg(Arg::with_name("input")
       .short("i")
-      .short("input")
+      .long("input")
       .help("Input file for page file access numbers")
       .takes_value(true)
     )
