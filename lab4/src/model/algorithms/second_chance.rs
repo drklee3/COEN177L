@@ -61,7 +61,7 @@ impl SecondChance {
     if page_index.is_none() {
       // big bottleneck!!
       if should_stdout {
-        println!("Page {} caused a page fault", page_request);
+        println!("Page number {} caused a page fault.", page_request);
       }
 
       loop {
