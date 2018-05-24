@@ -40,6 +40,7 @@ fn main() {
     )
     .arg(Arg::with_name("stdout")
       .short("s")
+      .long("stdout")
       .help("Enables stdout logging for each page fault")
     )
     .arg(Arg::with_name("algorithm")

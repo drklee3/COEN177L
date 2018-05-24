@@ -22,7 +22,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -s               Enables stdout logging for each page fault
+    -s, --stdout     Enables stdout logging for each page fault
     -V, --version    Prints version information
     -v               Sets the level of verbosity
 
@@ -37,7 +37,7 @@ ARGS:
     <table_size>    Sets the page table size
 ```
 
-Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the number of threads the number of CPU cores for concurrent simulations. Individual simulations are single threaded.
+Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the same number of threads as the number of CPU cores for concurrent simulations. Individual simulations are single threaded.
 
 ## Examples
 
