@@ -2,6 +2,7 @@ use model::algorithms::*;
 use parking_lot::RwLock;
 use std::sync::Arc;
 
+/// Options for a simulation
 pub struct SimulationOptions<'a> {
   pub input: Option<&'a str>,
   pub table_size: usize,
@@ -10,6 +11,7 @@ pub struct SimulationOptions<'a> {
   pub should_stdout: bool,
 }
 
+/// A holder for simulation data
 pub struct Simulation {
   algorithm: AlgorithmType,
   num_requests: u64,
@@ -17,6 +19,7 @@ pub struct Simulation {
 }
 
 impl Simulation {
+  /// Creates a new simulation with a specified table size and algorithm type
   pub fn new(table_size: usize, algorithm: &str,
     page_requests: Option<Arc<RwLock<Vec<String>>>>) -> Self {
     let algorithm = match algorithm {
@@ -34,6 +37,7 @@ impl Simulation {
     }
   }
 
+  /// Parses a string to a u64 and validates if > 0
   pub fn parse_line(&self, line: &str) -> Option<u64> {
     line.parse::<u64>()
       .ok()
@@ -46,6 +50,7 @@ impl Simulation {
       })
   }
 
+  /// Runs a single page request on the page table
   pub fn page_request(&mut self, page_request: &str, should_stdout: bool) {
     let page_request = match self.parse_line(page_request) {
       Some(req) => req,
@@ -68,6 +73,7 @@ impl Simulation {
     }
   }
 
+  /// Calculates the hit rate from number of hits / misses
   pub fn get_hit_rate(&self, should_stdout: bool) -> f64 {
     let num_hits = self.num_requests - self.num_misses;
     let hit_rate = num_hits as f64 / self.num_requests as f64;
