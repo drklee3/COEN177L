@@ -53,7 +53,7 @@ impl Lru {
     let (_min_time, min_index) = self.table
       .iter()
       .enumerate()
-      .fold((0, 0), |mut acc, (i, x)| {
+      .fold((u64::max_value(), 0), |mut acc, (i, x)| {
         if x.time < acc.0 {
           acc.0 = x.time;
           acc.1 = i;
