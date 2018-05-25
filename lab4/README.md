@@ -71,8 +71,9 @@ $ R
 > install.packages("reshape2")
 > q() # select workspace image with y
 
-# run script
+# run scripts
 $ Rscript visualize.R
+$ Rscript accesses.R
 ```
 
 ## Implementations
