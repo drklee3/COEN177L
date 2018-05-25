@@ -1,6 +1,6 @@
 use chrono;
 use csv::Writer;
-use error::{Error, Result};
+use error::Result;
 use fern::{
   self,
   colors::{
@@ -45,19 +45,7 @@ pub fn setup_logger(verbosity: u64) -> Result<()> {
   Ok(())
 }
 
-/// Parses command line arguments to get a valid page table size
-pub fn parse_args() -> Result<usize> {
-  let args: Vec<String> = std::env::args().collect();
-
-  if args.len() != 2 {
-    return Err(Error::from("Missing argument for table size."));
-  }
-
-  args[1]
-    .parse::<usize>()
-    .map_err(From::from)
-}
-
+/// Validates of a table size is both a number and greater than 0
 pub fn validate_table_size(size: String) -> std::result::Result<(), String> {
   if let Ok(parsed) = size.parse::<usize>() {
     if parsed <= 0 {
@@ -72,6 +60,7 @@ pub fn validate_table_size(size: String) -> std::result::Result<(), String> {
   Ok(())
 }
 
+/// Saves a vec of hit rates to a csv file
 pub fn save_result(output: &str, algorithm: &str, mut hit_rates: Vec<(usize, f64)>)
   -> Result<()> {
   // sort vec, likely out of order due to multithreading
