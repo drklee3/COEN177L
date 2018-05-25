@@ -87,7 +87,7 @@ fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
     pool.execute(move || {
       // info!("Running simulation with table size {}", curr_table_size);
       bar.set_message(&format!("Simulating table size {}", curr_table_size));
-      let mut sim = Simulation::new(curr_table_size, &algorithm);
+      let mut sim = Simulation::new(curr_table_size, &algorithm, Some(page_requests.clone()));
       // iterate over file lines
       let reader = page_requests.read();
       for page_request in reader.iter() {
@@ -116,7 +116,7 @@ fn simulate_file(options: SimulationOptions) -> Result<Vec<(usize, f64)>> {
 /// Runs a single simulation without input buffering to allow for immediate
 /// feedback per page request, main use case for testing
 fn simulate_stdin(table_size: usize, algorithm: &str, should_stdout: bool) -> Result<f64> {
-  let mut sim = Simulation::new(table_size, algorithm);
+  let mut sim = Simulation::new(table_size, algorithm, None);
   let stdin = io::stdin();
 
   // iterate over input lines

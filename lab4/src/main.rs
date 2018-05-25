@@ -49,7 +49,7 @@ fn main() {
       .help("Sets the page replacement algorithm to use")
       .required(true)
       .takes_value(true)
-      .possible_values(&["fifo", "lru", "second_chance", "sc"])
+      .possible_values(&["fifo", "lru", "second_chance", "sc", "optimal"])
     )
     .arg(Arg::with_name("to_table_size")
       .short("t")

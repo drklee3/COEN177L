@@ -1,4 +1,6 @@
 use model::algorithms::*;
+use parking_lot::RwLock;
+use std::sync::Arc;
 
 pub struct SimulationOptions<'a> {
   pub input: Option<&'a str>,
@@ -15,10 +17,12 @@ pub struct Simulation {
 }
 
 impl Simulation {
-  pub fn new(table_size: usize, algorithm: &str) -> Self {
+  pub fn new(table_size: usize, algorithm: &str,
+    page_requests: Option<Arc<RwLock<Vec<String>>>>) -> Self {
     let algorithm = match algorithm {
       "fifo" => AlgorithmType::Fifo(Fifo::new(table_size)),
       "lru" => AlgorithmType::Lru(Lru::new(table_size)),
+      "optimal" => AlgorithmType::Optimal(Optimal::new(table_size, page_requests)),
       "second_chance" | "sc" => AlgorithmType::SecondChance(SecondChance::new(table_size)),
       _ => unreachable!(),
     };
@@ -54,6 +58,7 @@ impl Simulation {
     let res = match self.algorithm {
       AlgorithmType::Fifo(ref mut x) => x.handle_page_request(page_request, should_stdout),
       AlgorithmType::Lru(ref mut x) => x.handle_page_request(page_request, should_stdout),
+      AlgorithmType::Optimal(ref mut x) => x.handle_page_request(page_request, should_stdout),
       AlgorithmType::SecondChance(ref mut x) => x.handle_page_request(page_request, should_stdout),
     };
     
