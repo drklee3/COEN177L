@@ -37,7 +37,9 @@ ARGS:
     <table_size>    Sets the page table size
 ```
 
-Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the same number of threads as the number of CPU cores for concurrent simulations. Individual simulations are single threaded.
+Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the same number of threads as the number of CPU cores for concurrent simulations. While multiple different simulations may be running concurrently, individual simulations are single threaded.
+
+Using `-v` or `-s` with a range of memory size is not recommended as it may result in very slow simulations.
 
 ## Examples
 
@@ -105,8 +107,8 @@ LRU is similar to FIFO in that when the page does not exist in memory, the page 
 
    Either the page is moved back to the "front" of the list, or the page's "time" is set to the current time.
 
-Using the method of moving pages to the front of the list when the page already exists in memory caused a decent amount of overhead similar to FIFO. While it is more simple to implement, this required removing the first element, shifting all elements over, then readding the element to the front. To reduce overhead, each page is assigned a time value. When a page is to be removed, instead of shifting elements in the vector around the item page number can be simply replaced with the new one and given the next time value. A O(n) loop would have to be done to search for the page to replace / remove, though requires than moving items in a vector.
-When a page is accessed and is in memory, the time value is simply set to the current time. The time used was simply a "global" incrementing counter for each insertion / access (global in the sense of all pages can use this value, but in terms of the program it is not a global variable).
+Using the method of moving pages to the front of the list when the page already exists in memory caused a decent amount of overhead similar to FIFO. While it is more simple to implement, this required removing the first element, shifting all elements over, then readding the element to the front. To reduce overhead, each page is assigned a time value. When a page is to be removed, instead of shifting elements in the vector around the item page number can be simply replaced with the new one and given the next time value. A O(n) loop would have to be done to search for the page to replace / remove which would be the page with the lowest / oldest time field, though requires less than moving items around in the vector.
+When a page is accessed and is in memory, the page's time value is simply set to the current time. The time used was simply a "global" incrementing counter for each insertion / access (global in the sense of all pages can use this value, but in terms of the program it is not a global variable).
 
 ### Second Chance (SC)
 
@@ -134,42 +136,14 @@ Hit Rate Overview
 | 200        | 0.66477 | 0.68420 | 0.68450       |
 | 500        | 0.90212 | 0.90128 | 0.90198       |
 
-From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in [`data/algorithm_data.csv`](data/algorithm_data.csv) and shown below visually in the plot.
+The three page replacement algorithms were tested with the given `accesses.txt` file for table sizes 10 to 500. From the table above of partial hit rate data, we can see that second chance produced the highest hit rates. LRU was very close, though lost to second chance by a very small amount. FIFO was the worst paging algorithm, though when it reached larger memory sizes (around 400), it was also very close. The full data for the range of memory sizes from 10 to 500 are in [`data/algorithm_data.csv`](data/algorithm_data.csv) and shown below visually in the plot.
 
 ![Page Replacement Algorithms Plot](plot.png)
 
+After the table sizes were tested above 400, the different algorithms start to deviate with FIFO briefly having higher hit rates and LRU having the lowest. This may have been caused by the specific data given. However, it also can show that with a large enough memory size, FIFO can still perform relatively well. There were a total of 625 unique page requests (found with the command `sort accesses.txt | uniq -c | wc -l`), and a select few pages that were constantly being requested as shown in the plot below.
 
+![Page Accesses](accesses.png)
 
-The Basics
-The goal of this assignment is to gain experience with page replacement (and to a lesser extent, caching) algorithms. In this assignment your goal is to write programs that simulate page replacement algorithms. Your initial program is to accept at least one numeric command-line parameter, which it will use as the number of available page frames. 
-For example:
-$lru 27
-or
-$simulate -lru 7
-should run a simulation of the LRU page replacement algorithm for a memory/cache size of 7 pages/blocks. But whence will page requests come? The answer is that your program should expect page requests to arrive on standard input (stdin, so a basic fgets(), or scanf(), call should suffice to read in the unsigned integer page numbers being requested). So assuming you have a sequence of page numbers in a text file called "accesses.txt" you should be able to run your simulator by typing:
-$cat accesses.txt | lru 42
+While this plot does not display when these page requests are made, we can see why FIFO was inferior to the other two page replacement algorithms as it would remove pages regardless of how much they were used. Since some pages were used over 150,000 times compared to most of the pages being requested below 12,500 times, these pages would have benefited most from LRU and second chance.
 
-* size of memory / # of page frames accepted as cli arg
-* output page number that is not in cache / page fault
-* Total numbers from input file = total # of page/block requests
-* Total numbers output from program = # requests that resulted in page fault
-* page requests as individual #s 1 per line
-* number = requested page number
-* ignore trailing text or lines that don't start with a number
-* terminate when reach EOF
-* status outputs sent to stderr
-* program for FIFO, LRU, Second Chance
-
-The output of your program will be every page number that was not found to be in the cache. In other words, the output of your program will be a sequence of page numbers that represents all the incoming requests that resulted in a page fault. Using your program, you should be able to get two numbers from the unix command line (by counting the number of lines read from the input file, and the number of lines produced by your simulator). The first of these numbers is the total number of page/block requests your simulator program has received (you get this by counting the number of valid lines in your input file), and the second number is how many of these page requests did result in a page fault (you get this by counting the number of lines produced as output by your program - which is faithfully reproducing the page replacement algorithm's behavior).
-Your programs are to accept page requests on stdin as individual numbers, one per line, where each number indicates the requested page number. Each program is to further ignore any trailing text on the input lines, or any lines that do not start with a number. Your program terminates its simulation when it encounters an end-of-file. Once again, the size of the memory being managed by your program (the number of page frames, or the size of the cache if you treat this as a caching algorithm) is to be accepted as a command-line argument to your program. Any status output (e.g., messages you wish to print for debugging/user) should be sent to stderr (standard error, in other words, it should be possible to use your program and see nothing in standard output other than the page-faults/cache-misses, by redirecting only stdout).
-You are to provide a program for each of the following replacement algorithms: FIFO, LRU, and Second Chance Page Replacement.
-Note that for Second Chance, when a page is first brought in to memory (i.e., into your array of page numbers in memory), it should have its referenced bit set to "FALSE." In other words, it starts in a state equivalent to having been given a second chance. Its referenced bit becomes "TRUE"  only after it is accessed due to a reference that follows the one that brought it into memory.
-
-second chance
-
-* first into memory reference bit = false
-* reference bit = true when accessed
-
-* graph of 3+
-* which one's better
-
+In the data found from simulations with the given page accesses file, second chance was the best page replacement algorithm by a very marginal amount compared to LRU, and by slightly larger amount with memory sizes around 425 to 475 pages. This, however, is potential to change depending on which and how the pages are accessed, how often and in what order each page is accessed. To find a more generalized result, a bigger number of page request sets can be used and an average can be found. Currently, the data provided is essentially a sample size of 1 so conclusions can only be drawn with this specific data.
