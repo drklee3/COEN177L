@@ -75,12 +75,12 @@ impl SecondChance {
         
         if !page.referenced {
           // replace page with new page request #, referenced should still be false
-          trace!("Replace entry: {} -> {}", page.number, page_request);
+          trace!("SWAP: {} -> {}", page.number, page_request);
           page.number = page_request;
           break;
         }
 
-        trace!("Reset entry: {}", page.number);
+        trace!("RESET: {}", page.number);
         page.referenced = false;
       }
 
@@ -93,11 +93,10 @@ impl SecondChance {
     let index = page_index.unwrap();
 
     // update page to be referenced
-    if let Some(page) = self.table.get_mut(index) {
-      trace!("Update entry: {:?}", page);
+    {
+      let page = self.table.get_mut(index).unwrap();
+      trace!("UPDATE: {:?}", page);
       page.referenced = true;
-    } else {
-      error!("Failed to get table value @ {}", index);
     }
 
     debug!("{:?}", self.table);

@@ -28,7 +28,7 @@ impl Fifo {
       // safe to unwrap, self.index should never go >= len 
       {
         let elem = self.table.get_mut(self.index).unwrap();
-        trace!("Modified {} -> {} at index {}", *elem, page_request, self.index);
+        trace!("SWAP: {} -> {} at index {}", *elem, page_request, self.index);
         *elem = page_request;
       }
 

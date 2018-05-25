@@ -36,31 +36,6 @@ pub struct Lru {
   time: u64,
 }
 
-/// A helper struct to store page table min/max values/indexes
-pub struct PageMinMax {
-  /// Max "time" value of a page
-  min: u64,
-  /// Min "time" value of a page
-  max: u64,
-
-  /// Index of min time page
-  min_index: usize,
-  /// Index of max time page
-  max_index: usize,
-}
-
-impl PageMinMax {
-  /// Creates a new PageMinMax
-  fn new() -> Self {
-    PageMinMax {
-      min: <u64>::max_value(),
-      max: 0,
-      min_index: 0,
-      max_index: 0,
-    }
-  }
-}
-
 impl Lru {
   /// Creates a new page table for LRU
   pub fn new(size: usize) -> Self {
@@ -73,19 +48,15 @@ impl Lru {
 
   /// Handles a page request, returns true if page fault occurred
   pub fn handle_page_request(&mut self, page_request: u64, should_stdout: bool) -> bool {
-    // get min and max times and indexes
-    let min_max_page = self.table
+    self.time += 1;
+    // get index of min page
+    let (_min_time, min_index) = self.table
       .iter()
       .enumerate()
-      .fold(PageMinMax::new(), |mut acc, (i, x)| {
-        if x.time < acc.min {
-          acc.min = x.time;
-          acc.min_index = i;
-        }
-        
-        if x.time > acc.max {
-          acc.max = x.time;
-          acc.max_index = i;
+      .fold((0, 0), |mut acc, (i, x)| {
+        if x.time < acc.0 {
+          acc.0 = x.time;
+          acc.1 = i;
         }
 
         acc
@@ -106,14 +77,14 @@ impl Lru {
       // create a new page entry
       let new_page = LruPage {
         number: page_request,
-        time: min_max_page.max + 1,
+        time: self.time,
       };
       
       // replace oldest entry with new one
       {
         // mutable borrow
-        let elem = self.table.get_mut(min_max_page.min_index).unwrap();
-        trace!("SWAP: [{:?} -> {:?}] @ i = {}", *elem, &new_page, min_max_page.min_index);
+        let elem = self.table.get_mut(min_index).unwrap();
+        trace!("SWAP: [{:?} -> {:?}] @ i = {}", *elem, &new_page, min_index);
         *elem = new_page;
         // mutable borrow ends
       }
@@ -128,8 +99,8 @@ impl Lru {
       let index = page_index.unwrap();
       let elem = self.table.get_mut(index).unwrap();
       trace!("ADJUST: #{} time [{} -> {}] @ i = {}",
-        elem.number, elem.time, min_max_page.max + 1, index);
-      elem.time = min_max_page.max + 1;
+        elem.number, elem.time, self.time, index);
+      elem.time = self.time;
     }
     
     debug!("{:?}", self.table);
