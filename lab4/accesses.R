@@ -21,9 +21,9 @@ ggplot() +
   # size dots 0 - 2
   scale_size_continuous(range = c(0, 3)) +
   # set x labels to every 1k
-  scale_x_discrete(breaks = seq(0, 10000, by = 1000)) +
+  scale_x_discrete(breaks = seq(0, 11000, by = 1000)) +
   labs(
-    title="Page Requests", 
+    title = "Page Requests", 
     y = "Number of Requests",
     x = "Page Request",
     color = NULL
