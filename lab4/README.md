@@ -54,15 +54,14 @@ cat accesses.txt | ./page-replacements 10 -a lru -s > output.txt
 
 # run lru show debug info (prints array / page table contents for each input)
 # probably not a good idea to use -v or -s with accesses.txt or large table sizes
-# printing to stdout is a big bottleneck
 # for second chance: blue = referenced, red = unreferenced
 # multiple instances of the v flag can be used to increase log level:
 # use -vv to display additional information
 ./page-replacements 10 -a lru -vs
 ```
 
-The graph was created with R, you can run it with `Rscript`.
-This requires a CSV file for each page replacement algorithm in the data directory following the file name `output.*.csv` with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
+The graphs were written with R, you can run it with `Rscript`.
+These require CSV files for each page replacement algorithm in the data directory following the file pattern `output.*.csv` and with headers `table_size,[algorithm_name]` (Example: `table_size,lru`)
 
 ```bash
 # install required R packages
@@ -86,7 +85,7 @@ First in first out was the most simple to implement. Page requests were added to
 
 1. The page does not exist in memory:
 
-   The page is added to the "front" of the list. If memory is full, the first page inserted is removed.
+   The page is added to the "front" of the list. If memory is full, the first page inserted is removed. In this implementation, it uses a circular vector and the page at the position is replaced.
 
 2. The page exists in memory:
 
@@ -102,13 +101,14 @@ LRU is similar to FIFO in that when the page does not exist in memory, the page 
 
 1. The page does not exist in memory:
 
-   The page is added to the "front" of the list. If memory is full, the oldest page is removed.
+   The page is added to the "front" of the list. If memory is full, the oldest page is removed. The oldest page is found by looping through each page to search for the one that has the lowest time value.
 
 2. The page exists in memory:
 
-   Either the page is moved back to the "front" of the list, or the page's "time" is set to the current time.
+   The page's time is updated to the current time.
 
-Using the method of moving pages to the front of the list when the page already exists in memory caused a decent amount of overhead similar to FIFO. While it is more simple to implement, this required removing the first element, shifting all elements over, then readding the element to the front. To reduce overhead, each page is assigned a time value. When a page is to be removed, instead of shifting elements in the vector around the item page number can be simply replaced with the new one and given the next time value. A O(n) loop would have to be done to search for the page to replace / remove which would be the page with the lowest / oldest time field, though requires less than moving items around in the vector.
+Using the method of moving pages to the front of the list when the page already exists in memory caused a decent amount of overhead similar to FIFO. While it is more simple to implement, it required removing the first element, shifting all elements over, then readding the element to the front. To reduce overhead, each page is assigned a time value. When a page is to be removed, instead of shifting elements in the vector around the item page number can be simply replaced with the new one and given the next time value. A O(n) loop would have to be done to search for the page to replace / remove which would be the page with the lowest / oldest time field, though requires less than shifting all the items in the vector.
+
 When a page is accessed and is in memory, the page's time value is simply set to the current time. The time used was simply a "global" incrementing counter for each insertion / access (global in the sense of all pages can use this value, but in terms of the program it is not a global variable).
 
 ### Second Chance (SC)
@@ -123,7 +123,7 @@ Second chance was an extension of FIFO conceptually, giving pages a second chanc
 
    The page's referenced "bit" is changed to 1 if previously 0. No changes if the page is already referenced.
 
-While the implementation can be done similar to previous methods with an extension of FIFO, it would also run into the same overhead of unnecessary shifts and page removals. To work around this, the clock algorithm was used instead with the same functionality of second chance with a circular vector / array. If the memory is full and a page request results in a page fault, the memory is looped until a page is found with the referenced bit set to 0 (or the reference bool set to false in this case) while resetting any pages that are referenced. The found page is then replaced with the new page request. If the page request refers to a page already in memory, the page's referenced bit / bool is simply set to 1 / true.
+While the implementation can be done similar to previous methods with an extension of FIFO, it would also run into the same overhead of unnecessary shifts and page removals. To work around this, the clock algorithm was used instead with the same functionality of second chance with a circular vector / array with each page having the member fields page number and referenced. If the memory is full and a page request results in a page fault, the memory is looped until a page is found with the referenced bit set to 0 (or the reference bool set to false in this case) while resetting any pages that are referenced. The found page is then replaced with the new page request. If the page request refers to a page already in memory, the page's referenced bit / bool is simply set to 1 / true.
 
 ## Results
 
@@ -145,10 +145,10 @@ After the table sizes were tested above 400, the different algorithms start to d
 
 ![Page Accesses](accesses.png)
 
-While this plot does not display when these page requests are made, we can see why FIFO was inferior to the other two page replacement algorithms as it would remove pages regardless of how much they were used. Since some pages were used over 150,000 times compared to most of the pages being requested below 12,500 times, these pages would have benefited most from LRU and second chance.
+While this plot does not display when these page requests are made, we can see why FIFO was inferior to the other two page replacement algorithms as it would remove pages regardless of how much they were used. Since some pages were used over 150,000 times compared to most of the pages being requested below 12,500 times, these pages would have benefited most from LRU and second chance. However, the order in which these pages were requested are a big factor in determining the algorithm hit rate which is omitted from the plot above.
 
 In the data found from simulations with the given page accesses file, second chance was the best page replacement algorithm by a very marginal amount compared to LRU, and by slightly larger amount with memory sizes around 425 to 475 pages. This, however, is potential to change depending on which and how the pages are accessed, how often and in what order each page is accessed.
 
-To find a more generalized result, a bigger number of page request sets can be used and an average can be found. Currently, the data provided is essentially a sample size of 1 so conclusions can only be drawn with this specific data. In different workloads, different algorithms including FIFO can result in a higher hit rate than the other ones.
+To find a more generalized result, a bigger number of page request sets can be used and an average can be found. Currently, the data provided is essentially a sample size of 1 so conclusions can only be drawn with this specific data. In different workloads, different algorithms including FIFO can result in a higher hit rate than the other ones. There is no specific best algorithm overall, only the best algorithm for the specific workload, in this specific case second chance. 
 
-For example with the following page requests `1, 2, 1, 3` and memory size of 2 pages, LRU would have `1, 3` and FIFO would have `2, 3` with equal number of page faults. If `2` is requested next, LRU will have a page fault while FIFO will not, making FIFO have a higher hit rate. If `1` is requested instead of `2`, LRU would be better.
+Different page replacement algorithms may be suitest best for a specfic workloads. For exapmle with the following page requests `1, 2, 1, 3` and memory size of 2 pages, LRU would have `1, 3` and FIFO would have `2, 3` with equal number of page faults. If `2` is requested next, LRU will have a page fault while FIFO will not, making FIFO have a higher hit rate. If `1` is requested instead of `2`, LRU would be better. This contrasts the given page requests since FIFO ended up with the lowest hit rate with the majority of memory sizes and shows that it depends on what order pages are used that determines the best algorithm.
