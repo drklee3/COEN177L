@@ -2,6 +2,9 @@ use parking_lot::RwLock;
 use std::sync::Arc;
 use std::process;
 
+// This optimal implementation is **not** working correctly
+// was intended to be used to compare with the other algorithms
+
 /// A page table entry for Optimal page replacement
 #[derive (Debug)]
 pub struct Optimal {
@@ -21,6 +24,7 @@ impl Optimal {
       error!("Must run optimal with page requests as an input file");
       process::exit(1);
     }
+
     Optimal {
       table: vec![0; size], // initialize vec with size 0s
       page_requests: page_requests.unwrap(),
