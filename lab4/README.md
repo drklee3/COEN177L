@@ -37,7 +37,7 @@ ARGS:
     <table_size>    Sets the page table size
 ```
 
-Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the same number of threads as the number of CPU cores for concurrent simulations. While multiple different simulations may be running concurrently, individual simulations are single threaded.
+Simulating a range of memory sizes with `-t <to_table_size>` or `--to <to_table_size>` will use a threadpool with the same number of threads as the number of CPU cores for concurrent simulations. While multiple different simulations may be running concurrently, individual simulations are single threaded. Instead, use `-o` or `--output` to save hit rate data.
 
 Using `-v` or `-s` with a range of memory size is not recommended as it may result in very slow simulations.
 
