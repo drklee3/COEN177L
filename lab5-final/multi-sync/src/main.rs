@@ -1,5 +1,6 @@
 use std::net::TcpListener;
 use std::io::Write;
+use std::thread;
 
 static RESPONSE: &[u8] = b"HTTP/1.1 200 OK\r\n\
     Content-Type: text/html; charset=UTF-8\r\n\r\n\
@@ -12,7 +13,9 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut stream) => {
-                let _ = stream.write(&RESPONSE);
+                thread::spawn(move || {
+                    let _ = stream.write(&RESPONSE);
+                });
             }
             Err(e) => {
                 println!("Unable to connect: {}", e);
