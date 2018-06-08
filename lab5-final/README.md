@@ -15,3 +15,5 @@ Tested with RwLock, Mutex, None
 ---
 
 ## Overhead of synchronization primitives
+
+http://preshing.com/20111118/locks-arent-slow-lock-contention-is/
