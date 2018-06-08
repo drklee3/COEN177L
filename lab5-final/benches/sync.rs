@@ -81,7 +81,11 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
     let mut units_left = units_thread;
     while units_left > 0 {
       // run units unlocked
-      let rand_units_unlocked = rng.gen_range(0, units_unlocked);
+      let rand_units_unlocked = if units_unlocked > 0 {
+        rng.gen_range(0, units_unlocked)
+      } else {
+        0
+      };
       for _ in 0..rand_units_unlocked {
         let _ = rng.gen::<u32>();
       }
@@ -92,7 +96,11 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
       // run units while locked
       let mut lock = data.lock().expect("Failed to get lock");
 
-      let rand_units_locked = rng.gen_range(0, units_locked);
+      let rand_units_locked = if units_locked > 0 {
+        rng.gen_range(0, units_locked)
+      } else {
+        0
+      };
       for _ in 0..rand_units_locked {
         let _ = rng.gen::<u32>();
       }
@@ -116,6 +124,24 @@ macro_rules! benchtest {
     }
   )
 }
+
+benchtest!{mutex_1t_0d, 1, 1000, 0.0}
+benchtest!{mutex_2t_0d, 2, 1000, 0.0}
+benchtest!{mutex_3t_0d, 3, 1000, 0.0}
+benchtest!{mutex_4t_0d, 4, 1000, 0.0}
+benchtest!{mutex_5t_0d, 5, 1000, 0.0}
+benchtest!{mutex_6t_0d, 6, 1000, 0.0}
+benchtest!{mutex_7t_0d, 7, 1000, 0.0}
+benchtest!{mutex_8t_0d, 8, 1000, 0.0}
+
+benchtest!{mutex_1t_10d, 1, 1000, 0.10}
+benchtest!{mutex_2t_10d, 2, 1000, 0.10}
+benchtest!{mutex_3t_10d, 3, 1000, 0.10}
+benchtest!{mutex_4t_10d, 4, 1000, 0.10}
+benchtest!{mutex_5t_10d, 5, 1000, 0.10}
+benchtest!{mutex_6t_10d, 6, 1000, 0.10}
+benchtest!{mutex_7t_10d, 7, 1000, 0.10}
+benchtest!{mutex_8t_10d, 8, 1000, 0.10}
 
 benchtest!{mutex_1t_25d, 1, 1000, 0.25}
 benchtest!{mutex_2t_25d, 2, 1000, 0.25}
@@ -143,6 +169,24 @@ benchtest!{mutex_5t_75d, 5, 1000, 0.75}
 benchtest!{mutex_6t_75d, 6, 1000, 0.75}
 benchtest!{mutex_7t_75d, 7, 1000, 0.75}
 benchtest!{mutex_8t_75d, 8, 1000, 0.75}
+
+benchtest!{mutex_1t_90d, 1, 1000, 0.90}
+benchtest!{mutex_2t_90d, 2, 1000, 0.90}
+benchtest!{mutex_3t_90d, 3, 1000, 0.90}
+benchtest!{mutex_4t_90d, 4, 1000, 0.90}
+benchtest!{mutex_5t_90d, 5, 1000, 0.90}
+benchtest!{mutex_6t_90d, 6, 1000, 0.90}
+benchtest!{mutex_7t_90d, 7, 1000, 0.90}
+benchtest!{mutex_8t_90d, 8, 1000, 0.90}
+
+benchtest!{mutex_1t_100d, 1, 1000, 1.0}
+benchtest!{mutex_2t_100d, 2, 1000, 1.0}
+benchtest!{mutex_3t_100d, 3, 1000, 1.0}
+benchtest!{mutex_4t_100d, 4, 1000, 1.0}
+benchtest!{mutex_5t_100d, 5, 1000, 1.0}
+benchtest!{mutex_6t_100d, 6, 1000, 1.0}
+benchtest!{mutex_7t_100d, 7, 1000, 1.0}
+benchtest!{mutex_8t_100d, 8, 1000, 1.0}
 
 #[bench]
 fn bench_rwlock_write(b: &mut Bencher) {
