@@ -125,68 +125,68 @@ macro_rules! benchtest {
   )
 }
 
-benchtest!{mutex_1t_0d, 1, 1000, 0.0}
-benchtest!{mutex_2t_0d, 2, 1000, 0.0}
-benchtest!{mutex_3t_0d, 3, 1000, 0.0}
-benchtest!{mutex_4t_0d, 4, 1000, 0.0}
-benchtest!{mutex_5t_0d, 5, 1000, 0.0}
-benchtest!{mutex_6t_0d, 6, 1000, 0.0}
-benchtest!{mutex_7t_0d, 7, 1000, 0.0}
-benchtest!{mutex_8t_0d, 8, 1000, 0.0}
+benchtest!{mutex_1t_0p, 1, 1000, 0.0}
+benchtest!{mutex_2t_0p, 2, 1000, 0.0}
+benchtest!{mutex_3t_0p, 3, 1000, 0.0}
+benchtest!{mutex_4t_0p, 4, 1000, 0.0}
+benchtest!{mutex_5t_0p, 5, 1000, 0.0}
+benchtest!{mutex_6t_0p, 6, 1000, 0.0}
+benchtest!{mutex_7t_0p, 7, 1000, 0.0}
+benchtest!{mutex_8t_0p, 8, 1000, 0.0}
 
-benchtest!{mutex_1t_10d, 1, 1000, 0.10}
-benchtest!{mutex_2t_10d, 2, 1000, 0.10}
-benchtest!{mutex_3t_10d, 3, 1000, 0.10}
-benchtest!{mutex_4t_10d, 4, 1000, 0.10}
-benchtest!{mutex_5t_10d, 5, 1000, 0.10}
-benchtest!{mutex_6t_10d, 6, 1000, 0.10}
-benchtest!{mutex_7t_10d, 7, 1000, 0.10}
-benchtest!{mutex_8t_10d, 8, 1000, 0.10}
+benchtest!{mutex_1t_10p, 1, 1000, 0.10}
+benchtest!{mutex_2t_10p, 2, 1000, 0.10}
+benchtest!{mutex_3t_10p, 3, 1000, 0.10}
+benchtest!{mutex_4t_10p, 4, 1000, 0.10}
+benchtest!{mutex_5t_10p, 5, 1000, 0.10}
+benchtest!{mutex_6t_10p, 6, 1000, 0.10}
+benchtest!{mutex_7t_10p, 7, 1000, 0.10}
+benchtest!{mutex_8t_10p, 8, 1000, 0.10}
 
-benchtest!{mutex_1t_25d, 1, 1000, 0.25}
-benchtest!{mutex_2t_25d, 2, 1000, 0.25}
-benchtest!{mutex_3t_25d, 3, 1000, 0.25}
-benchtest!{mutex_4t_25d, 4, 1000, 0.25}
-benchtest!{mutex_5t_25d, 5, 1000, 0.25}
-benchtest!{mutex_6t_25d, 6, 1000, 0.25}
-benchtest!{mutex_7t_25d, 7, 1000, 0.25}
-benchtest!{mutex_8t_25d, 8, 1000, 0.25}
+benchtest!{mutex_1t_25p, 1, 1000, 0.25}
+benchtest!{mutex_2t_25p, 2, 1000, 0.25}
+benchtest!{mutex_3t_25p, 3, 1000, 0.25}
+benchtest!{mutex_4t_25p, 4, 1000, 0.25}
+benchtest!{mutex_5t_25p, 5, 1000, 0.25}
+benchtest!{mutex_6t_25p, 6, 1000, 0.25}
+benchtest!{mutex_7t_25p, 7, 1000, 0.25}
+benchtest!{mutex_8t_25p, 8, 1000, 0.25}
 
-benchtest!{mutex_1t_50d, 1, 1000, 0.50}
-benchtest!{mutex_2t_50d, 2, 1000, 0.50}
-benchtest!{mutex_3t_50d, 3, 1000, 0.50}
-benchtest!{mutex_4t_50d, 4, 1000, 0.50}
-benchtest!{mutex_5t_50d, 5, 1000, 0.50}
-benchtest!{mutex_6t_50d, 6, 1000, 0.50}
-benchtest!{mutex_7t_50d, 7, 1000, 0.50}
-benchtest!{mutex_8t_50d, 8, 1000, 0.50}
+benchtest!{mutex_1t_50p, 1, 1000, 0.50}
+benchtest!{mutex_2t_50p, 2, 1000, 0.50}
+benchtest!{mutex_3t_50p, 3, 1000, 0.50}
+benchtest!{mutex_4t_50p, 4, 1000, 0.50}
+benchtest!{mutex_5t_50p, 5, 1000, 0.50}
+benchtest!{mutex_6t_50p, 6, 1000, 0.50}
+benchtest!{mutex_7t_50p, 7, 1000, 0.50}
+benchtest!{mutex_8t_50p, 8, 1000, 0.50}
 
-benchtest!{mutex_1t_75d, 1, 1000, 0.75}
-benchtest!{mutex_2t_75d, 2, 1000, 0.75}
-benchtest!{mutex_3t_75d, 3, 1000, 0.75}
-benchtest!{mutex_4t_75d, 4, 1000, 0.75}
-benchtest!{mutex_5t_75d, 5, 1000, 0.75}
-benchtest!{mutex_6t_75d, 6, 1000, 0.75}
-benchtest!{mutex_7t_75d, 7, 1000, 0.75}
-benchtest!{mutex_8t_75d, 8, 1000, 0.75}
+benchtest!{mutex_1t_75p, 1, 1000, 0.75}
+benchtest!{mutex_2t_75p, 2, 1000, 0.75}
+benchtest!{mutex_3t_75p, 3, 1000, 0.75}
+benchtest!{mutex_4t_75p, 4, 1000, 0.75}
+benchtest!{mutex_5t_75p, 5, 1000, 0.75}
+benchtest!{mutex_6t_75p, 6, 1000, 0.75}
+benchtest!{mutex_7t_75p, 7, 1000, 0.75}
+benchtest!{mutex_8t_75p, 8, 1000, 0.75}
 
-benchtest!{mutex_1t_90d, 1, 1000, 0.90}
-benchtest!{mutex_2t_90d, 2, 1000, 0.90}
-benchtest!{mutex_3t_90d, 3, 1000, 0.90}
-benchtest!{mutex_4t_90d, 4, 1000, 0.90}
-benchtest!{mutex_5t_90d, 5, 1000, 0.90}
-benchtest!{mutex_6t_90d, 6, 1000, 0.90}
-benchtest!{mutex_7t_90d, 7, 1000, 0.90}
-benchtest!{mutex_8t_90d, 8, 1000, 0.90}
+benchtest!{mutex_1t_90p, 1, 1000, 0.90}
+benchtest!{mutex_2t_90p, 2, 1000, 0.90}
+benchtest!{mutex_3t_90p, 3, 1000, 0.90}
+benchtest!{mutex_4t_90p, 4, 1000, 0.90}
+benchtest!{mutex_5t_90p, 5, 1000, 0.90}
+benchtest!{mutex_6t_90p, 6, 1000, 0.90}
+benchtest!{mutex_7t_90p, 7, 1000, 0.90}
+benchtest!{mutex_8t_90p, 8, 1000, 0.90}
 
-benchtest!{mutex_1t_100d, 1, 1000, 1.0}
-benchtest!{mutex_2t_100d, 2, 1000, 1.0}
-benchtest!{mutex_3t_100d, 3, 1000, 1.0}
-benchtest!{mutex_4t_100d, 4, 1000, 1.0}
-benchtest!{mutex_5t_100d, 5, 1000, 1.0}
-benchtest!{mutex_6t_100d, 6, 1000, 1.0}
-benchtest!{mutex_7t_100d, 7, 1000, 1.0}
-benchtest!{mutex_8t_100d, 8, 1000, 1.0}
+benchtest!{mutex_1t_100p, 1, 1000, 1.0}
+benchtest!{mutex_2t_100p, 2, 1000, 1.0}
+benchtest!{mutex_3t_100p, 3, 1000, 1.0}
+benchtest!{mutex_4t_100p, 4, 1000, 1.0}
+benchtest!{mutex_5t_100p, 5, 1000, 1.0}
+benchtest!{mutex_6t_100p, 6, 1000, 1.0}
+benchtest!{mutex_7t_100p, 7, 1000, 1.0}
+benchtest!{mutex_8t_100p, 8, 1000, 1.0}
 
 #[bench]
 fn bench_rwlock_write(b: &mut Bencher) {
