@@ -29,7 +29,6 @@ fn main() {
 
 #[derive(Debug, Serialize)]
 struct Data {
-    name: String,
     thread_count: usize,
     lock_percentage: u64,
     time: u64,
@@ -43,9 +42,6 @@ fn parse_bench(text: &str) -> Vec<Data> {
     let mut data = Vec::new();
 
     for cap in RE.captures_iter(text) {
-        let name = cap[1]
-            .to_owned();
-
         let thread_count = cap[2]
             .replace("t", "")
             .parse::<usize>()
@@ -62,7 +58,6 @@ fn parse_bench(text: &str) -> Vec<Data> {
             .unwrap();
 
         data.push(Data {
-            name,
             thread_count,
             lock_percentage,
             time,
