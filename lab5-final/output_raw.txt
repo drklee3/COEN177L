@@ -1,3 +1,27 @@
+warning: unused imports: `AtomicPtr`, `AtomicU64`, `Ordering`
+  --> benches/sync.rs:12:25
+   |
+12 | use std::sync::atomic::{Ordering, AtomicPtr, AtomicU64};
+   |                         ^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^
+   |
+   = note: #[warn(unused_imports)] on by default
+
+    Finished release [optimized] target(s) in 31.07s
+     Running target/release/deps/lab5_final-0fdbdc1c6e3e0aca
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running target/release/deps/sync-70577031390f865a
+
+running 814 tests
+test bench_arc          ... bench:   1,769,166 ns/iter (+/- 19,336)
+test bench_mutex        ... bench:  20,039,394 ns/iter (+/- 704,974)
+test bench_no_sync      ... bench:     296,184 ns/iter (+/- 21,998)
+test bench_rc           ... bench:   1,769,157 ns/iter (+/- 11,479)
+test bench_rwlock_read  ... bench:  42,877,341 ns/iter (+/- 540,236)
+test bench_rwlock_write ... bench:  35,037,785 ns/iter (+/- 1,083,687)
 test mutex_1t_000p      ... bench:      73,185 ns/iter (+/- 21,031)
 test mutex_1t_001p      ... bench:      68,795 ns/iter (+/- 22,568)
 test mutex_1t_002p      ... bench:      72,099 ns/iter (+/- 20,412)
@@ -806,3 +830,5 @@ test mutex_8t_097p      ... bench:     166,957 ns/iter (+/- 35,275)
 test mutex_8t_098p      ... bench:     177,506 ns/iter (+/- 30,526)
 test mutex_8t_099p      ... bench:     163,504 ns/iter (+/- 28,096)
 test mutex_8t_100p      ... bench:     163,808 ns/iter (+/- 45,406)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 814 measured; 0 filtered out
