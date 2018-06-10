@@ -5,7 +5,6 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
-
 use std::fs::File;
 use std::error::Error;
 use std::env;
@@ -44,10 +43,23 @@ fn parse_bench(text: &str) -> Vec<Data> {
     let mut data = Vec::new();
 
     for cap in RE.captures_iter(text) {
-        let name = cap[1].to_owned();
-        let thread_count = cap[2].replace("t", "").parse::<usize>().unwrap();
-        let lock_percentage = cap[3].replace("p", "").parse::<u64>().unwrap();
-        let time = cap[4].replace(",", "").parse::<u64>().unwrap();
+        let name = cap[1]
+            .to_owned();
+
+        let thread_count = cap[2]
+            .replace("t", "")
+            .parse::<usize>()
+            .unwrap();
+
+        let lock_percentage = cap[3]
+            .replace("p", "")
+            .parse::<u64>()
+            .unwrap();
+
+        let time = cap[4]
+            .replace(",", "")
+            .parse::<u64>()
+            .unwrap();
 
         data.push(Data {
             name,
