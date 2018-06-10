@@ -25,6 +25,7 @@ fn main() {
 
     let data = parse_bench(&contents);
     let _ = save_file(data, &args[2]);
+    println!("done");
 }
 
 #[derive(Debug, Serialize)]
