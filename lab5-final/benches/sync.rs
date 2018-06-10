@@ -5,17 +5,18 @@ extern crate threadpool;
 extern crate rand;
 
 use test::Bencher;
+use std::cmp::min;
 use std::cell::Cell;
 use std::rc::Rc;
 
 use std::sync::{Arc, Mutex, RwLock};
-use std::sync::atomic::{Ordering, AtomicPtr, AtomicU64};
 
 use rand::prelude::*;
 
 const NUM_ITERS: u64 = 1_000_000;
-const NUM_UNITS: u64 = 1_000;
+const NUM_UNITS: u64 = 1_000_000;
 
+/*
 #[bench]
 fn bench_no_sync(b: &mut Bencher) {
   b.iter(|| {
@@ -83,6 +84,7 @@ fn bench_mutex(b: &mut Bencher) {
     }
   })
 }
+*/
 
 fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
   let units_thread = units / threads as u64;            // units per thread
@@ -93,8 +95,6 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
   let pool = threadpool::Builder::new()
     .num_threads(threads)
     .build();
-
-  println!("{}", pool.max_count());
 
   // spawn number of threads
   for _ in 0..threads {
@@ -107,7 +107,7 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
       while units_left > 0 {
         // calculate units to run while unlocked
         let rand_units_unlocked = if units_unlocked > 0 {
-          rng.gen_range(0, units_unlocked)
+          min(rng.gen_range(0, units_unlocked), units_left)
         } else {
           0
         };
@@ -125,7 +125,7 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
 
         // calculate units to run while locked
         let rand_units_locked = if units_locked > 0 {
-          rng.gen_range(0, units_locked)
+          min(rng.gen_range(0, units_locked), units_left)
         } else {
           0
         };
@@ -140,8 +140,11 @@ fn bench_mutex_threads(threads: usize, units: u64, locked_percentage: f64) {
 
         // update data in mutex
         *lock += rand_units_unlocked + rand_units_locked;
+        drop(lock);
       }
     });
+
+    
   }
 
   // block until all threads complete
@@ -972,3 +975,4 @@ benchtest!{mutex_8t_097p, 8, 0.97}
 benchtest!{mutex_8t_098p, 8, 0.98}
 benchtest!{mutex_8t_099p, 8, 0.99}
 benchtest!{mutex_8t_100p, 8, 1.00}
+
