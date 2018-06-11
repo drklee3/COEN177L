@@ -31,7 +31,7 @@ ggplot() +
   labs(
     title="Lock Performance (1M work units)",
     y = "Time (ms)",
-    x = "Lock Duration",
+    x = "Lock Duration (Percentage)",
     color = "Threads"
   )
 
