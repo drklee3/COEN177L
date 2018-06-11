@@ -10,6 +10,10 @@ data <- read.csv(
 )
 head(data)
 
+ns_to_ms <- function(x) { 
+  x / 1000000
+}
+
 # plot 
 ggplot() +
   geom_line(
@@ -23,9 +27,10 @@ ggplot() +
     size = .5,
     alpha=0.80
   ) +
+  scale_y_continuous(labels = ns_to_ms) +
   labs(
-    title="Lock Performance", 
-    y = "Time (ns)",
+    title="Lock Performance (1M work units)",
+    y = "Time (ms)",
     x = "Lock Duration",
     color = "Threads"
   )
