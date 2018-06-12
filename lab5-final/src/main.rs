@@ -1,22 +1,22 @@
 extern crate csv;
-extern crate regex;
 #[macro_use]
 extern crate lazy_static;
+extern crate regex;
 #[macro_use]
 extern crate serde_derive;
 
-use std::fs::File;
-use std::error::Error;
-use std::env;
-use std::process;
-use std::io::Read;
 use regex::Regex;
+use std::error::Error;
+use std::fs::File;
+use std::io::Read;
 
+/// Converts raw bench output to a csv file.
+/// Not the cleanest and will fail if an error occurs.
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
         println!("Requires input and output file");
-        process::exit(1);
+        std::process::exit(1);
     }
     let mut file = File::open(&args[1]).unwrap();
     let mut contents = String::new();
@@ -34,6 +34,7 @@ struct Data {
     time: u64,
 }
 
+/// Parse bench output
 fn parse_bench(text: &str) -> Vec<Data> {
     lazy_static! {
         static ref RE: Regex = Regex::new(r"test (\w*)_(\w*)_(\w*) .* ([\d,]*) ns").unwrap();
@@ -67,6 +68,7 @@ fn parse_bench(text: &str) -> Vec<Data> {
     data
 }
 
+/// Saves parsed bench output to csv file
 fn save_file(data: Vec<Data>, output: &str) -> Result<(), Box<Error>> {
     let mut wtr = csv::Writer::from_path(output)?;
     
