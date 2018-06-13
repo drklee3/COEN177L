@@ -1,19 +1,9 @@
 # Final Lab
 
-## Multithreaded performance and overhead
+## Overhead of synchronization primitives (Mutex)
 
-* CPU / IO bound task spread across different threads
-* time to completion
-* CPU / memory consumption
+When using mutexes, the overhead may be considered. However, lock contention has a much bigger impact that makes lock overhead negligible.
 
-Utilizing the previous lab of page replacements due to it's CPU intensive algorithms and large amount of data to process.
-
-Previously made to use the same number of threads as CPU cores (which *should* be optimal).
-
-Tested with RwLock, Mutex, None
-
----
-
-## Overhead of synchronization primitives
+![Plot](plot.png)
 
 http://preshing.com/20111118/locks-arent-slow-lock-contention-is/
