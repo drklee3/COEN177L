@@ -4,6 +4,16 @@
 
 When dealing with synchronization requirements, there is additional code and processing to be done to maintain mutual exclusion. Because of this, the overhead of such code may be considered. However, lock contention in certain cases may have a much bigger impact that makes overhead of locks negligible.
 
+# Running
+
+```bash
+curl https://sh.rustup.rs -sSf | sh # install Rust
+rustup install nightly # install nightly Rust
+cargo +nightly bench > output.txt # run benchmarks and output data to file
+
+cargo run output.txt output.csv # parse raw bench output to csv file
+```
+
 # Testing
 
 To figure out what the raw overhead of a mutex was, a set of benchmarks were made. In this case, only mutual exclusions were tested as other synchronization primitives such as reader-writer locks would be similar (for writers as there can be only a single writer at any given time). Using Rust as the programming language, in order to safely use a mutex, it would need to be `Arc<Mutex>` type. An `Arc<T>` is a reference counting pointer, "Arc" standing for "atomically reference counted." This allows for thread safe data to be both sent and shared across different threads due to the atomic operations, and reference counting in order to know when the data `T` in `Arc<T>` should be destroyed (when the last Arc pointer is destroyed). `Mutex<T>` is a Send type safe to send across threads and `Arc<T>` is a Sync type safe to share across threads. Because of this, there is both the added overhead of the mutual exclusion itself and the reference-counting pointer.
@@ -31,6 +41,6 @@ Percentages were not constant to allow for randomness in lock contention. For ex
 
 # Conclusion
 
-While with lots of variation, the plot above shows that single threaded work produced a relatively constant performance independent from how long the lock was acquired which is expected as there would be no waiting on other threads. With low percentages of lock durations, the introduction of more threads allows for better performance due to parallel processing of the work units spread across multiple CPU cores. However, as the duration of locks increased, the graph clearly shows (albeit a bit messy) that performance quickly becomes degraded. While single threaded work produced the same performance, the multi threaded work became much slower, seemingly increasingly slow as the number of threads increased.
+While with lots of variation, the plot above shows that single threaded work produced a relatively constant performance independent from how long the lock was acquired which is expected as there would be no waiting on other threads. With low percentages of lock durations, the introduction of more threads allows for better performance due to parallel processing of the work units spread across multiple CPU cores. However, as the duration of locks increased, the graph clearly shows (albeit a bit messy with a good amount of variation) that performance quickly becomes degraded. While single threaded work produced the same performance, the multi threaded work became much slower, seemingly increasingly slow as the number of threads increased.
 
 While there may be some overhead for synchronization primitives, they quickly become negligible in some workloads due to lock contention. When dealing with multithreaded programs and locks the focus should not be entirely on overhead of locks, but rather minimizing the amount of lock contention and unnecessary waiting or blocking.
