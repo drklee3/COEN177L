@@ -10,7 +10,7 @@ To figure out what the raw overhead of a mutex was, a set of benchmarks were mad
 
 # Results
 
-`Arc<T>` was compared with `Cell<T>`, which is similar to a simple pointer type. The following table shows the time per iteration for different data types. Each benchmark looped from 0 to 1,000,000 incrementing the inner data type by 1 each iteration. This loop is then repeated for at least 301 times and the average is returned. The resulting average is then divided by 1,000,000 to find the iteration time for an individual u64 increment, required locks and references.
+`Arc<T>` was compared with `Cell<T>`, which is similar to a simple pointer type. The following table shows the time per iteration for different data types. Each benchmark looped from 0 to 1,000,000 incrementing the inner data type by 1 each iteration. This loop is then repeated for at least 301 times and the average is returned. The resulting average is then divided by 1,000,000 to find the iteration time for an individual `u64` (64-bit unsigned integer type) increment, required locks and references.
 
 | `Cell<u64>`     | `Arc<u64>`       | `Mutex<u64>`      | `Arc<Mutex<u64>>` |
 | --------------- | ---------------- | ----------------- | ----------------- |
