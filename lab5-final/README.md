@@ -8,10 +8,10 @@ When dealing with synchronization requirements, there is additional code and pro
 
 ```bash
 curl https://sh.rustup.rs -sSf | sh # install Rust
-rustup install nightly # install nightly Rust
-cargo +nightly bench > output.txt # run benchmarks and output data to file
+rustup install nightly              # install nightly toolchain
+cargo +nightly bench > output.txt   # run benchmarks and output data to file
 
-cargo run output.txt output.csv # parse raw bench output to csv file
+cargo run output.txt output.csv     # parse raw bench output to csv file
 ```
 
 # Testing
